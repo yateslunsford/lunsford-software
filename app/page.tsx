@@ -1,99 +1,136 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { motion, useScroll, useTransform, useReducedMotion, AnimatePresence, MotionValue } from 'framer-motion';
+import Marquee from '@/components/Marquee';
 
+/* ─── Lazy-load the heavy WebGL hero so it doesn't block initial render ─── */
+const CardHero = dynamic(() => import('@/components/CardHero'), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="relative"
+      style={{ height: '250vh', background: 'linear-gradient(to bottom, #080808 0%, #080808 55%, #2a2a2a 75%, #b8b8b8 90%, #fafafa 100%)' }}
+    />
+  ),
+});
+
+/* ─── Marquee content ─── */
+const TECH_ITEMS = [
+  'NEXT.JS', '·', 'TYPESCRIPT', '·', 'TAILWIND', '·', 'THREE.JS', '·',
+  'FRAMER MOTION', '·', 'SANITY CMS', '·', 'STRIPE', '·', 'TWILIO', '·',
+  'VERCEL', '·', 'REACT', '·', '@REACT-THREE/FIBER', '·',
+];
+const FACTS_TOP = [
+  'BUILT FROM SCRATCH', '·', '60 FPS', '·', 'ZERO TEMPLATES', '·',
+  'CUSTOM CODED', '·', 'SHIPS IN WEEKS', '·', 'MOBILE FIRST', '·',
+];
+const FACTS_BOT = [
+  'NEXT.JS 16', '·', 'HAND-WRITTEN CODE', '·', 'REAL CMS', '·',
+  'STRIPE READY', '·', 'SMS NOTIFY', '·', 'VERCEL DEPLOY', '·',
+];
+
+/* ═══════════════════════════════════════════════════════════
+   ROOT
+═══════════════════════════════════════════════════════════ */
 export default function Home() {
+  const [modalTier, setModalTier] = useState<{ tier: string; price: string } | null>(null);
+
   return (
     <main className="bg-[#fafafa] text-[#0a0a0a]">
       <Nav />
-      <Hero />
+      <CardHero />
       <Pitch />
-      <Services />
+
+      {/* ── Tech stack ribbon between Pitch and Services ── */}
+      <TechRibbon />
+
+      <Services onTierSelect={(t) => setModalTier(t)} />
       <FeaturedWork />
+
+      {/* ── Build-facts ribbon between Work and Process ── */}
+      <FactsRibbon />
+
       <Process />
+
+      {/* ── Gradient bridge: light → dark ── */}
+      <div
+        className="h-32 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, #fafafa, #000000)' }}
+        aria-hidden="true"
+      />
+
       <About />
+
+      {/* ── Gradient bridge: dark → light ── */}
+      <div
+        className="h-32 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, #000000, #fafafa)' }}
+        aria-hidden="true"
+      />
+
       <Contact />
       <Footer />
+
+      <AnimatePresence>
+        {modalTier && (
+          <PricingModal
+            tier={modalTier.tier}
+            price={modalTier.price}
+            onClose={() => setModalTier(null)}
+          />
+        )}
+      </AnimatePresence>
     </main>
   );
 }
 
-/* ============ NAV ============ */
+/* ═══════════════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════════════ */
 function Nav() {
   return (
     <nav className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[#fafafa]/70 border-b border-black/5">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="#" className="font-mono text-sm tracking-tight font-medium">LUNSFORD<span className="text-gray-400">/SOFTWARE</span></a>
+        <a href="#" className="font-mono text-sm tracking-tight font-semibold">
+          LUNSFORD<span className="text-gray-400">/SOFTWARE</span>
+        </a>
         <div className="hidden md:flex items-center gap-8 text-sm text-gray-600">
           <a href="#services" className="hover:text-black transition-colors">Services</a>
-          <a href="#work" className="hover:text-black transition-colors">Work</a>
-          <a href="#process" className="hover:text-black transition-colors">Process</a>
-          <a href="#about" className="hover:text-black transition-colors">About</a>
+          <a href="#work"     className="hover:text-black transition-colors">Work</a>
+          <a href="#process"  className="hover:text-black transition-colors">Process</a>
+          <a href="#about"    className="hover:text-black transition-colors">About</a>
         </div>
-        <a href="#contact" className="text-sm bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors">Start a project</a>
+        <a
+          href="#contact"
+          className="text-sm bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors font-semibold"
+        >
+          Start a project
+        </a>
       </div>
     </nav>
   );
 }
 
-/* ============ HERO ============ */
-function Hero() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-
-  const letters = "LUNSFORD".split("");
-  const subtitleOpacity = useTransform(scrollYProgress, [0.45, 0.6], [0, 1]);
-  const subtitleY = useTransform(scrollYProgress, [0.45, 0.6], [40, 0]);
-  const ctaOpacity = useTransform(scrollYProgress, [0.6, 0.8], [0, 1]);
-  const ctaY = useTransform(scrollYProgress, [0.6, 0.8], [40, 0]);
-  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.4]);
-  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
-
-  return (
-    <section ref={ref} className="relative h-[300vh]">
-      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ scale: bgScale, background: 'radial-gradient(circle at 50% 50%, rgba(255,180,120,0.08), transparent 70%)' }} />
-        <div className="relative flex items-center justify-center px-4" style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}>
-          {letters.map((letter, i) => (<Letter key={i} letter={letter} index={i} total={letters.length} progress={scrollYProgress} />))}
-        </div>
-        <motion.div className="absolute inset-x-0 top-1/2 text-center mt-32" style={{ opacity: subtitleOpacity, y: subtitleY }}>
-          <p className="font-mono text-xs md:text-sm tracking-[0.5em] text-gray-500 uppercase">Software Development</p>
-        </motion.div>
-        <motion.div className="absolute bottom-20 inset-x-0 text-center px-6" style={{ opacity: ctaOpacity, y: ctaY }}>
-          <p className="text-xl md:text-3xl text-gray-800 mb-8 font-light max-w-2xl mx-auto leading-snug">Custom websites that don&apos;t look like everyone else&apos;s.</p>
-          <a href="#contact" className="inline-block px-8 py-3.5 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">Start a project →</a>
-        </motion.div>
-        <motion.div className="absolute bottom-6 inset-x-0 text-center text-xs text-gray-400 font-mono tracking-widest" style={{ opacity: scrollHintOpacity }}>SCROLL</motion.div>
-      </div>
-    </section>
-  );
-}
-
-function Letter({ letter, index, total, progress }: { letter: string; index: number; total: number; progress: MotionValue<number> }) {
-  const stagger = index / total;
-  const start = stagger * 0.3;
-  const end = start + 0.4;
-  const rotateY = useTransform(progress, [start, end], [0, 540]);
-  const z = useTransform(progress, [start, (start + end) / 2, end], [0, 80 + index * 15, 0]);
-  const opacity = useTransform(progress, [0.45, 0.55], [1, 0]);
-
-  return (
-    <motion.span className="inline-block font-black tracking-tight leading-none select-none" style={{ fontSize: 'clamp(3rem, 13vw, 12rem)', rotateY, z, opacity, transformStyle: 'preserve-3d' }}>{letter}</motion.span>
-  );
-}
-
-/* ============ PITCH ============ */
+/* ═══════════════════════════════════════════════════════════
+   PITCH
+═══════════════════════════════════════════════════════════ */
 function Pitch() {
+  const shouldReduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const yFast = useTransform(scrollYProgress, [0, 1], [200, -200]);
-  const ySlow = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const yMid = useTransform(scrollYProgress, [0, 1], [150, -150]);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const yFast = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [200, -200]);
+  const ySlow = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [100, -100]);
+  const yMid  = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [150, -150]);
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden py-32">
-      <motion.div className="absolute top-20 left-[10%] w-40 h-28 md:w-56 md:h-36 bg-white rounded-xl shadow-lg border border-black/5 rotate-[-8deg]" style={{ y: yFast }}>
+    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden py-20">
+      {/* Floating mock-UI cards */}
+      <motion.div
+        className="absolute top-20 left-[10%] w-40 h-28 md:w-56 md:h-36 bg-white rounded-xl shadow-lg border border-black/5 rotate-[-8deg]"
+        style={{ y: yFast }}
+      >
         <div className="p-3">
           <div className="w-8 h-2 bg-gray-200 rounded mb-2" />
           <div className="w-full h-1.5 bg-gray-100 rounded mb-1" />
@@ -101,7 +138,11 @@ function Pitch() {
           <div className="w-16 h-5 bg-black rounded" />
         </div>
       </motion.div>
-      <motion.div className="absolute top-40 right-[8%] w-48 h-32 md:w-64 md:h-44 bg-white rounded-xl shadow-xl border border-black/5 rotate-[6deg]" style={{ y: ySlow }}>
+
+      <motion.div
+        className="absolute top-40 right-[8%] w-48 h-32 md:w-64 md:h-44 bg-white rounded-xl shadow-xl border border-black/5 rotate-[6deg]"
+        style={{ y: ySlow }}
+      >
         <div className="p-3">
           <div className="flex gap-1 mb-3">
             <div className="w-2 h-2 bg-red-300 rounded-full" />
@@ -113,88 +154,265 @@ function Pitch() {
           <div className="w-3/4 h-1.5 bg-gray-100 rounded" />
         </div>
       </motion.div>
-      <motion.div className="absolute bottom-20 left-[20%] w-32 h-32 md:w-44 md:h-44 bg-gradient-to-br from-orange-100 to-pink-100 rounded-2xl shadow-md rotate-[12deg]" style={{ y: yMid }} />
-      <motion.div className="absolute bottom-32 right-[15%] w-36 h-24 md:w-52 md:h-32 bg-black rounded-xl shadow-xl rotate-[-5deg]" style={{ y: yFast }}>
+
+      <motion.div
+        className="absolute bottom-20 left-[20%] w-32 h-32 md:w-44 md:h-44 bg-gradient-to-br from-orange-100 to-pink-100 rounded-2xl shadow-md rotate-[12deg]"
+        style={{ y: yMid }}
+      />
+
+      <motion.div
+        className="absolute bottom-32 right-[15%] w-36 h-24 md:w-52 md:h-32 bg-black rounded-xl shadow-xl rotate-[-5deg]"
+        style={{ y: yFast }}
+      >
         <div className="p-3">
           <div className="w-12 h-1.5 bg-gray-700 rounded mb-2" />
           <div className="w-full h-1 bg-gray-800 rounded mb-1" />
           <div className="w-2/3 h-1 bg-gray-800 rounded" />
         </div>
       </motion.div>
+
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <motion.p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-6 uppercase" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>The pitch</motion.p>
-        <motion.h2 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}>Most freelancers ship templates.<br /><span className="text-gray-400">I ship custom builds.</span></motion.h2>
-        <motion.p className="mt-8 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8, delay: 0.2 }}>Every site is built from scratch. No themes, no page builders, no template farms. Just clean code, fast loads, and designs your customers actually remember.</motion.p>
+        <motion.p
+          className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-6 uppercase"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+        >
+          The pitch
+        </motion.p>
+        <motion.h2
+          className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          Most freelancers ship templates.<br />
+          <span className="text-gray-400">I ship custom builds.</span>
+        </motion.h2>
+        <motion.p
+          className="mt-8 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          Every site is built from scratch. No themes, no page builders, no template farms.
+          Just clean code, fast loads, and designs your customers actually remember.
+        </motion.p>
       </div>
     </section>
   );
 }
 
-/* ============ SERVICES ============ */
-function Services() {
+/* ═══════════════════════════════════════════════════════════
+   TECH RIBBON  (Pitch → Services bridge)
+═══════════════════════════════════════════════════════════ */
+function TechRibbon() {
+  return (
+    <div className="border-y border-black/[0.07] py-3 overflow-hidden bg-[#fafafa]">
+      <Marquee
+        items={TECH_ITEMS}
+        speed={40}
+        itemClassName="font-mono text-[11px] tracking-[0.2em] text-gray-400 px-2"
+      />
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SERVICES
+═══════════════════════════════════════════════════════════ */
+const TIERS = [
+  {
+    index: 0,
+    title: 'Starter',
+    price: '$800',
+    tag: 'Get online. Look legit.',
+    features: [
+      '5-page custom site',
+      'Mobile responsive',
+      'Contact form',
+      'SEO foundations',
+      '1-week delivery',
+    ],
+  },
+  {
+    index: 1,
+    title: 'Pro',
+    price: '$2,000',
+    tag: 'Sell, scale, ship drops.',
+    featured: true,
+    features: [
+      'Everything in Starter',
+      'Sanity CMS',
+      'Stripe checkout',
+      'SMS notifications',
+      '2–3 week build',
+    ],
+  },
+  {
+    index: 2,
+    title: 'Custom',
+    price: '$3,500+',
+    tag: 'Build whatever you describe.',
+    features: [
+      'Full custom systems',
+      'Booking & dashboards',
+      'API integrations',
+      'E-commerce',
+      'Ongoing iteration',
+    ],
+  },
+] as const;
+
+type Tier = (typeof TIERS)[number];
+
+function Services({ onTierSelect }: { onTierSelect: (t: { tier: string; price: string }) => void }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
   const headerOpacity = useTransform(scrollYProgress, [0, 0.1, 0.85, 1], [0, 1, 1, 0]);
 
   return (
     <section id="services" ref={ref} className="relative h-[300vh]">
       <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-6">
-        <motion.div className="text-center mb-12" style={{ opacity: headerOpacity }}>
+        <motion.div className="text-center mb-7" style={{ opacity: headerOpacity }}>
           <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Services</p>
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight">Three ways to work together.</h2>
+          <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">
+            Three ways to work together.
+          </h2>
         </motion.div>
-        <div className="relative flex items-center justify-center w-full max-w-6xl" style={{ perspective: '1500px' }}>
-          <ServiceCard index={0} progress={scrollYProgress} title="Starter" price="$800" tag="Small business" features={["Up to 5 pages", "Mobile responsive", "Contact form", "SEO basics", "Launch in 2 weeks"]} />
-          <ServiceCard index={1} progress={scrollYProgress} title="Pro" price="$2,000" tag="Most popular" features={["Up to 10 pages", "Custom design", "CMS so you can edit", "Email automation", "Launch in 3-4 weeks"]} featured />
-          <ServiceCard index={2} progress={scrollYProgress} title="Custom" price="$3,500+" tag="E-commerce / scale" features={["Unlimited pages", "Full e-commerce", "Custom integrations", "Booking systems", "Ongoing support"]} />
+
+        <div
+          className="relative flex items-center justify-center w-full max-w-6xl"
+          style={{ perspective: '1500px' }}
+        >
+          {TIERS.map((t) => (
+            <ServiceCard
+              key={t.index}
+              tier={t}
+              progress={scrollYProgress}
+              onSelect={() => onTierSelect({ tier: t.title, price: t.price })}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function ServiceCard({ index, progress, title, price, tag, features, featured }: { index: number; progress: MotionValue<number>; title: string; price: string; tag: string; features: string[]; featured?: boolean }) {
-  const startScroll = 0.15;
-  const endScroll = 0.55;
-  const positions = [-340, 0, 340];
-  const rotations = [-8, 0, 8];
-  const finalX = positions[index];
-  const finalRotate = rotations[index];
-  const x = useTransform(progress, [startScroll, endScroll], [0, finalX]);
-  const rotate = useTransform(progress, [startScroll, endScroll], [0, finalRotate]);
-  const z = useTransform(progress, [startScroll, endScroll], [-index * 20, 0]);
-  const cardOpacity = useTransform(progress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
+function ServiceCard({
+  tier,
+  progress,
+  onSelect,
+}: {
+  tier: Tier;
+  progress: MotionValue<number>;
+  onSelect: () => void;
+}) {
+  const { index, title, price, tag, features } = tier;
+  const featured = 'featured' in tier && tier.featured === true;
+
+  const positions  = [-340, 0, 340] as const;
+  const rotations  = [-8, 0, 8] as const;
+
+  const x       = useTransform(progress, [0.15, 0.55], [0, positions[index]]);
+  const rotate  = useTransform(progress, [0.15, 0.55], [0, rotations[index]]);
+  const z       = useTransform(progress, [0.15, 0.55], [-index * 20, 0]);
+  const opacity = useTransform(progress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
 
   return (
-    <motion.div className={`absolute w-72 md:w-80 p-8 rounded-2xl border ${featured ? 'bg-black text-white border-black shadow-2xl' : 'bg-white text-black border-black/10 shadow-xl'}`} style={{ x, rotate, z, opacity: cardOpacity, transformStyle: 'preserve-3d', zIndex: featured ? 10 : 5 }}>
-      <div className="flex items-center justify-between mb-6">
-        <span className={`text-xs font-mono tracking-widest uppercase ${featured ? 'text-orange-300' : 'text-gray-400'}`}>{tag}</span>
-        {featured && (<span className="text-[10px] font-mono uppercase bg-orange-400 text-black px-2 py-1 rounded-full">Popular</span>)}
+    <motion.div
+      className={`absolute w-72 md:w-80 p-6 rounded-2xl border ${
+        featured
+          ? 'bg-black text-white border-black shadow-2xl'
+          : 'bg-white text-black border-black/10 shadow-2xl'
+      }`}
+      style={{ x, rotate, z, opacity, transformStyle: 'preserve-3d', zIndex: featured ? 10 : 5 }}
+    >
+      {/* Header row */}
+      <div className="flex items-start justify-between mb-5 gap-2">
+        <span
+          className={`text-xs font-mono tracking-widest uppercase leading-snug ${
+            featured ? 'text-orange-300' : 'text-gray-400'
+          }`}
+        >
+          {tag}
+        </span>
+        {featured && (
+          <motion.span
+            className="shrink-0 text-[10px] font-mono uppercase bg-orange-400 text-black px-2 py-1 rounded-full"
+            animate={{ scale: [1, 1.06, 1] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            Popular
+          </motion.span>
+        )}
       </div>
-      <h3 className="text-3xl font-bold mb-2">{title}</h3>
-      <div className={`text-4xl font-bold mb-6 ${featured ? 'text-white' : 'text-black'}`}>{price}</div>
-      <ul className="space-y-3">
-        {features.map((f, i) => (<li key={i} className={`text-sm flex items-start gap-2 ${featured ? 'text-gray-300' : 'text-gray-700'}`}><span className={featured ? 'text-orange-400' : 'text-black'}>→</span>{f}</li>))}
+
+      <h3 className="text-3xl font-extrabold mb-1">{title}</h3>
+      <div className={`text-4xl font-extrabold mb-5 ${featured ? 'text-white' : 'text-black'}`}>
+        {price}
+      </div>
+
+      <ul className="space-y-2.5 mb-6">
+        {features.map((f, i) => (
+          <li
+            key={i}
+            className={`text-sm flex items-start gap-2 ${
+              featured ? 'text-gray-300' : 'text-gray-700'
+            }`}
+          >
+            <span className={featured ? 'text-orange-400' : 'text-black'}>→</span>
+            {f}
+          </li>
+        ))}
       </ul>
+
+      <button
+        onClick={onSelect}
+        className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors ${
+          featured
+            ? 'bg-orange-400 text-black hover:bg-orange-300'
+            : 'bg-black text-white hover:bg-gray-800'
+        }`}
+      >
+        Start with {title} →
+      </button>
     </motion.div>
   );
 }
 
-/* ============ FEATURED WORK ============ */
+/* ═══════════════════════════════════════════════════════════
+   FEATURED WORK
+═══════════════════════════════════════════════════════════ */
 function FeaturedWork() {
+  const shouldReduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const mockupY = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const mockupRotate = useTransform(scrollYProgress, [0, 1], [4, -4]);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const mockupY      = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [100, -100]);
+  const mockupRotate = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [4, -4]);
 
   return (
-    <section id="work" ref={ref} className="relative py-32 px-6">
+    <section id="work" ref={ref} className="relative py-20 px-6">
       <div className="max-w-7xl mx-auto">
-        <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+        <motion.div
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+        >
           <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Featured Work</p>
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight">Recent build.</h2>
+          <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">Recent build.</h2>
         </motion.div>
-        <motion.div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl" style={{ y: mockupY, rotate: mockupRotate, transformStyle: 'preserve-3d' }}>
+
+        <motion.div
+          className="relative bg-black rounded-3xl overflow-hidden shadow-2xl"
+          style={{ y: mockupY, rotate: mockupRotate, transformStyle: 'preserve-3d' }}
+        >
+          {/* Browser chrome */}
           <div className="bg-zinc-900 px-4 py-3 flex items-center gap-2 border-b border-zinc-800">
             <div className="flex gap-1.5">
               <div className="w-2.5 h-2.5 bg-red-500/70 rounded-full" />
@@ -203,6 +421,8 @@ function FeaturedWork() {
             </div>
             <div className="ml-4 text-xs font-mono text-gray-500">ruined-visions-site.vercel.app</div>
           </div>
+
+          {/* Mockup content */}
           <div className="relative h-[400px] md:h-[500px] bg-gradient-to-b from-zinc-900 to-black flex flex-col items-center justify-center text-center p-8">
             <div className="absolute inset-0 opacity-30">
               <div className="absolute top-1/4 left-1/4 w-0.5 h-0.5 bg-white rounded-full" />
@@ -211,19 +431,46 @@ function FeaturedWork() {
               <div className="absolute top-1/2 right-1/4 w-0.5 h-0.5 bg-white rounded-full" />
               <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-white rounded-full" />
             </div>
-            <div className="text-white text-3xl md:text-5xl font-black tracking-widest mb-4 relative z-10">RUINED VISIONS</div>
-            <div className="text-orange-400 text-xs font-mono tracking-[0.4em] uppercase relative z-10">Drop · July 17 · 8PM EST</div>
-            <div className="mt-8 px-6 py-2 border border-white/30 text-white text-xs font-mono tracking-widest uppercase relative z-10">57 Days · 14 Hrs · 22 Min</div>
+            <div className="text-white text-3xl md:text-5xl font-black tracking-widest mb-4 relative z-10">
+              RUINED VISIONS
+            </div>
+            <div className="text-orange-400 text-xs font-mono tracking-[0.4em] uppercase relative z-10">
+              Drop · July 17 · 8PM EST
+            </div>
+            <div className="mt-8 px-6 py-2 border border-white/30 text-white text-xs font-mono tracking-widest uppercase relative z-10">
+              57 Days · 14 Hrs · 22 Min
+            </div>
           </div>
         </motion.div>
-        <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }}>
-          <Stat label="Build time" value="3 weeks" />
-          <Stat label="Integrations" value="10+" />
-          <Stat label="Tech stack" value="Next.js 16" />
-          <Stat label="Status" value="Pre-launch" />
+
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Stat label="Build time"  value="3 weeks"   />
+          <Stat label="Integrations" value="10+"      />
+          <Stat label="Tech stack"  value="Next.js 16" />
+          <Stat label="Status"      value="Pre-launch" />
         </motion.div>
-        <motion.div className="mt-12 text-center" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.4 }}>
-          <a href="https://ruined-visions-site.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-3.5 border-2 border-black text-black rounded-full text-sm font-medium hover:bg-black hover:text-white transition-colors">View live site →</a>
+
+        <motion.div
+          className="mt-8 text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <a
+            href="https://ruined-visions-site.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-8 py-3.5 border-2 border-black text-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition-colors"
+          >
+            View live site →
+          </a>
         </motion.div>
       </div>
     </section>
@@ -233,33 +480,69 @@ function FeaturedWork() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="text-center">
-      <div className="text-2xl md:text-3xl font-bold mb-1">{value}</div>
+      <div className="text-2xl md:text-3xl font-extrabold mb-1">{value}</div>
       <div className="text-xs font-mono tracking-widest uppercase text-gray-500">{label}</div>
     </div>
   );
 }
 
-/* ============ PROCESS ============ */
+/* ═══════════════════════════════════════════════════════════
+   FACTS RIBBON  (Work → Process bridge)
+═══════════════════════════════════════════════════════════ */
+function FactsRibbon() {
+  return (
+    <div className="border-y border-black/[0.07] overflow-hidden bg-[#fafafa]">
+      <div className="py-2.5 border-b border-black/[0.04]">
+        <Marquee
+          items={FACTS_TOP}
+          speed={28}
+          itemClassName="font-mono text-[11px] tracking-[0.2em] text-gray-400 px-2"
+        />
+      </div>
+      <div className="py-2.5">
+        <Marquee
+          items={FACTS_BOT}
+          speed={34}
+          reverse
+          itemClassName="font-mono text-[11px] tracking-[0.2em] text-gray-400 px-2"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PROCESS
+═══════════════════════════════════════════════════════════ */
+const STEPS = [
+  { num: '01', title: 'Discovery', desc: 'Quick call. What you need, what you don\'t, what makes your business different.' },
+  { num: '02', title: 'Design',    desc: 'Custom mockups in Figma. You see the whole thing before a line of code is written.' },
+  { num: '03', title: 'Build',     desc: 'I code it. Fast, clean, mobile-first. You get updates as it comes together.' },
+  { num: '04', title: 'Launch',    desc: 'Live on the web with everything set up — hosting, domain, analytics, the works.' },
+] as const;
+
 function Process() {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const steps = [
-    { num: "01", title: "Discovery", desc: "Quick call. What you need, what you don't, what makes your business different." },
-    { num: "02", title: "Design", desc: "Custom mockups in Figma. You see the whole thing before a line of code is written." },
-    { num: "03", title: "Build", desc: "I code it. Fast, clean, mobile-first. You get updates as it comes together." },
-    { num: "04", title: "Launch", desc: "Live on the web with everything set up — hosting, domain, analytics, the works." },
-  ];
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
 
   return (
     <section id="process" ref={ref} className="relative h-[400vh]">
       <div className="sticky top-0 h-screen flex items-center overflow-hidden px-6">
         <div className="max-w-6xl mx-auto w-full">
-          <div className="mb-12">
+          <div className="mb-7">
             <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Process</p>
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight">From idea to launch.</h2>
+            <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">From idea to launch.</h2>
           </div>
-          <div className="space-y-8">
-            {steps.map((step, i) => (<ProcessStep key={i} step={step} index={i} total={steps.length} progress={scrollYProgress} />))}
+          <div className="space-y-5">
+            {STEPS.map((step, i) => (
+              <ProcessStep
+                key={i}
+                step={step}
+                index={i}
+                total={STEPS.length}
+                progress={scrollYProgress}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -267,87 +550,207 @@ function Process() {
   );
 }
 
-function ProcessStep({ step, index, total, progress }: { step: { num: string; title: string; desc: string }; index: number; total: number; progress: MotionValue<number> }) {
+function ProcessStep({
+  step,
+  index,
+  total,
+  progress,
+}: {
+  step: { num: string; title: string; desc: string };
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+}) {
+  const shouldReduce = useReducedMotion();
   const start = index / total;
-  const end = (index + 1) / total;
-  const scale = useTransform(progress, [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)], [0.95, 1.05, 1.05, 0.95]);
-  const opacity = useTransform(progress, [Math.max(0, start - 0.1), start, end, Math.min(1, end + 0.1)], [0.3, 1, 1, 0.3]);
-  const x = useTransform(progress, [start, end], [0, 20]);
+  const end   = (index + 1) / total;
+
+  const scale   = useTransform(
+    progress,
+    [Math.max(0, start - 0.05), start, end, Math.min(1, end + 0.05)],
+    shouldReduce ? [1, 1, 1, 1] : [0.95, 1.05, 1.05, 0.95],
+  );
+  const opacity = useTransform(
+    progress,
+    [Math.max(0, start - 0.1), start, end, Math.min(1, end + 0.1)],
+    [0.3, 1, 1, 0.3],
+  );
+  const x = useTransform(progress, [start, end], shouldReduce ? [0, 0] : [0, 20]);
 
   return (
-    <motion.div className="flex items-start gap-8 border-l-2 border-black/10 pl-8 py-2" style={{ scale, opacity, x, originX: 0 }}>
+    <motion.div
+      className="flex items-start gap-8 border-l-2 border-black/10 pl-8 py-2"
+      style={{ scale, opacity, x, originX: 0 }}
+    >
       <div className="font-mono text-sm text-gray-400 pt-2 min-w-[3rem]">{step.num}</div>
       <div className="flex-1">
-        <h3 className="text-2xl md:text-4xl font-bold mb-2">{step.title}</h3>
+        <h3 className="text-2xl md:text-4xl font-extrabold mb-2">{step.title}</h3>
         <p className="text-gray-600 text-base md:text-lg max-w-2xl">{step.desc}</p>
       </div>
     </motion.div>
   );
 }
 
-/* ============ ABOUT ============ */
+/* ═══════════════════════════════════════════════════════════
+   ABOUT
+═══════════════════════════════════════════════════════════ */
 function About() {
   return (
-    <section id="about" className="py-32 px-6 bg-black text-white">
+    <section id="about" className="py-20 px-6 bg-black text-white">
       <div className="max-w-4xl mx-auto">
-        <motion.p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-6 uppercase" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }}>About</motion.p>
-        <motion.h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-12 leading-tight" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}>I&apos;m Yates. 16. Self-taught. <span className="text-gray-500">Based in Newnan, GA.</span></motion.h2>
-        <motion.div className="space-y-6 text-lg md:text-xl text-gray-300 leading-relaxed" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8, delay: 0.2 }}>
-          <p>I started building websites because the agencies in town were charging local businesses $5,000 for template sites that loaded slow and looked like every other site in town.</p>
-          <p>I do it different. Every site is custom. Every line of code is hand-written. And I answer the phone when you call — because I&apos;m not running an agency, I&apos;m running a one-person operation that takes pride in shipping work I&apos;d put my name on.</p>
-          <p className="text-white">That&apos;s the whole pitch. Quality work, fair price, and someone who actually picks up.</p>
+        <motion.p
+          className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-6 uppercase"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+        >
+          About
+        </motion.p>
+        <motion.h2
+          className="text-4xl md:text-6xl font-extrabold tracking-tight mb-7 leading-tight"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8 }}
+        >
+          I&apos;m Yates. 16. Self-taught.{' '}
+          <span className="text-gray-500">Based in Newnan, GA.</span>
+        </motion.h2>
+        <motion.div
+          className="space-y-6 text-lg md:text-xl text-gray-300 leading-relaxed"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <p>
+            I started building websites because the agencies in town were charging local businesses
+            $5,000 for template sites that loaded slow and looked like every other site in town.
+          </p>
+          <p>
+            I do it different. Every site is custom. Every line of code is hand-written. And I answer
+            the phone when you call — because I&apos;m not running an agency, I&apos;m running a
+            one-person operation that takes pride in shipping work I&apos;d put my name on.
+          </p>
+          <p className="text-white">
+            That&apos;s the whole pitch. Quality work, fair price, and someone who actually picks up.
+          </p>
         </motion.div>
       </div>
     </section>
   );
 }
 
-/* ============ CONTACT ============ */
+/* ═══════════════════════════════════════════════════════════
+   CONTACT
+═══════════════════════════════════════════════════════════ */
 function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const subject = encodeURIComponent('New project inquiry — Lunsford Software');
+    const body    = encodeURIComponent(
+      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`,
+    );
+    window.open(`mailto:ylunsford1@gmail.com?subject=${subject}&body=${body}`);
     setSubmitted(true);
   };
 
   return (
-    <section id="contact" className="py-32 px-6">
+    <section id="contact" className="py-20 px-6">
       <div className="max-w-6xl mx-auto">
-        <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+        <motion.div
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+        >
           <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Contact</p>
-          <h2 className="text-4xl md:text-7xl font-bold tracking-tight leading-tight">Let&apos;s build<br />something good.</h2>
+          <h2 className="text-4xl md:text-7xl font-extrabold tracking-tight leading-tight">
+            Let&apos;s build<br />something good.
+          </h2>
         </motion.div>
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }}>
-            <h3 className="text-2xl font-bold mb-6">Send a message</h3>
+
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+          {/* Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <h3 className="text-2xl font-extrabold mb-6">Send a message</h3>
             {submitted ? (
               <div className="p-6 bg-black text-white rounded-2xl">
-                <p className="font-medium mb-2">Got it. I&apos;ll respond within 24 hours.</p>
+                <p className="font-semibold mb-2">Got it. I&apos;ll respond within 24 hours.</p>
                 <p className="text-sm text-gray-400">In a rush? Text me at 470-215-2012.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <input type="text" required placeholder="Your name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors" />
-                <input type="email" required placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors" />
-                <textarea required rows={5} placeholder="What are you trying to build?" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors resize-none" />
-                <button type="submit" className="w-full py-3.5 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors">Send →</button>
+                <input
+                  type="text" required placeholder="Your name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
+                />
+                <input
+                  type="email" required placeholder="Email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
+                />
+                <textarea
+                  required rows={5} placeholder="What are you trying to build?"
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors resize-none"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-3.5 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+                >
+                  Send →
+                </button>
               </form>
             )}
           </motion.div>
-          <motion.div className="bg-black text-white rounded-2xl p-8 md:p-10" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }}>
-            <h3 className="text-2xl font-bold mb-4">Or book a free call</h3>
-            <p className="text-gray-300 mb-8 leading-relaxed">15 minutes. We talk about what you&apos;re trying to build, I tell you if I&apos;m the right fit, and we go from there. No pressure, no pitch deck.</p>
-            <a href="https://cal.com/lunsfordsoftware/15min" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-3.5 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200 transition-colors mb-8">Book a 15-min call →</a>
-            <div className="pt-8 border-t border-white/10 space-y-3 text-sm">
+
+          {/* Booking card */}
+          <motion.div
+            className="bg-black text-white rounded-2xl p-6 md:p-8"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <h3 className="text-2xl font-extrabold mb-4">Or book a free call</h3>
+            <p className="text-gray-300 mb-8 leading-relaxed">
+              15 minutes. We talk about what you&apos;re trying to build, I tell you if I&apos;m the
+              right fit, and we go from there. No pressure, no pitch deck.
+            </p>
+            <a
+              href="https://cal.com/lunsfordsoftware/15min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-3.5 bg-white text-black rounded-full text-sm font-semibold hover:bg-gray-200 transition-colors mb-8"
+            >
+              Book a 15-min call →
+            </a>
+            <div className="pt-6 border-t border-white/10 space-y-3 text-sm">
               <div className="flex items-center gap-3 text-gray-400">
                 <span className="font-mono text-xs tracking-widest uppercase w-16">Email</span>
-                <a href="mailto:ylunsford1@gmail.com" className="text-white hover:text-orange-400 transition-colors">ylunsford1@gmail.com</a>
+                <a href="mailto:ylunsford1@gmail.com" className="text-white hover:text-orange-400 transition-colors">
+                  ylunsford1@gmail.com
+                </a>
               </div>
               <div className="flex items-center gap-3 text-gray-400">
                 <span className="font-mono text-xs tracking-widest uppercase w-16">Phone</span>
-                <a href="tel:4702152012" className="text-white hover:text-orange-400 transition-colors">470-215-2012</a>
+                <a href="tel:4702152012" className="text-white hover:text-orange-400 transition-colors">
+                  470-215-2012
+                </a>
               </div>
               <div className="flex items-center gap-3 text-gray-400">
                 <span className="font-mono text-xs tracking-widest uppercase w-16">Based</span>
@@ -361,14 +764,128 @@ function Contact() {
   );
 }
 
-/* ============ FOOTER ============ */
+/* ═══════════════════════════════════════════════════════════
+   FOOTER  — oversized wordmark marquee
+═══════════════════════════════════════════════════════════ */
 function Footer() {
   return (
-    <footer className="border-t border-black/10 py-12 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+    <footer className="border-t border-black/10 overflow-hidden bg-[#fafafa]">
+      {/* Ghost wordmark strip */}
+      <div className="py-4 border-b border-black/[0.04] overflow-hidden">
+        <Marquee
+          items={['LUNSFORD', '·', 'LUNSFORD', '·', 'LUNSFORD', '·', 'LUNSFORD', '·']}
+          speed={22}
+          itemClassName="font-extrabold tracking-tight px-6 leading-none text-black/[0.06]"
+          itemStyle={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
+        />
+      </div>
+      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
         <div className="font-mono">© {new Date().getFullYear()} Lunsford Software Development</div>
         <div className="font-mono text-xs tracking-widest uppercase">Built in Newnan, GA</div>
       </div>
     </footer>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRICING MODAL
+═══════════════════════════════════════════════════════════ */
+function PricingModal({
+  tier,
+  price,
+  onClose,
+}: {
+  tier: string;
+  price: string;
+  onClose: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: `Hi Yates — I'm interested in the ${tier} package (${price}). Here's what I need:\n\n`,
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  /* Close on Escape */
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`${tier} package inquiry — Lunsford Software`);
+    const body    = encodeURIComponent(
+      `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`,
+    );
+    window.open(`mailto:ylunsford1@gmail.com?subject=${subject}&body=${body}`);
+    setSubmitted(true);
+  };
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/70 backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl relative"
+        initial={{ y: 48, opacity: 0, scale: 0.96 }}
+        animate={{ y: 0,  opacity: 1, scale: 1    }}
+        exit={{    y: 48, opacity: 0, scale: 0.96 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 transition-colors text-gray-500 text-sm"
+        >
+          ✕
+        </button>
+
+        <p className="font-mono text-xs tracking-widest uppercase text-gray-400 mb-2">
+          {tier} · {price}
+        </p>
+        <h3 className="text-2xl font-extrabold mb-6">Let&apos;s talk about your project.</h3>
+
+        {submitted ? (
+          <div className="p-6 bg-black text-white rounded-xl text-center">
+            <p className="font-semibold mb-1">Email client opened. I&apos;ll reply within 24 hours.</p>
+            <p className="text-sm text-gray-400">Prefer to call? 470-215-2012.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text" required placeholder="Your name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
+            />
+            <input
+              type="email" required placeholder="Email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
+            />
+            <textarea
+              required rows={4}
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors resize-none text-sm"
+            />
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+            >
+              Send inquiry →
+            </button>
+          </form>
+        )}
+      </motion.div>
+    </motion.div>
   );
 }
