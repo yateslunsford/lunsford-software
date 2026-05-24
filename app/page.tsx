@@ -1,22 +1,11 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform, useReducedMotion, AnimatePresence, MotionValue } from 'framer-motion';
 import Marquee from '@/components/Marquee';
 import PricingSection from '@/components/PricingSection';
 import FeaturedWork from '@/components/FeaturedWork';
-
-/* ─── Lazy-load the heavy WebGL hero so it doesn't block initial render ─── */
-const CardHero = dynamic(() => import('@/components/CardHero'), {
-  ssr: false,
-  loading: () => (
-    <div
-      className="relative"
-      style={{ height: '250vh', background: 'linear-gradient(to bottom, #080808 0%, #080808 55%, #2a2a2a 75%, #b8b8b8 90%, #fafafa 100%)' }}
-    />
-  ),
-});
+import Hero from '@/components/Hero';
 
 /* ─── Marquee content ─── */
 const TECH_ITEMS = [
@@ -42,7 +31,7 @@ export default function Home() {
   return (
     <main className="bg-[#fafafa] text-[#0a0a0a]">
       <Nav />
-      <CardHero />
+      <Hero />
       <Pitch />
 
       {/* ── Tech stack ribbon between Pitch and Services ── */}
