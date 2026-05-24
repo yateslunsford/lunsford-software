@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform, useReducedMotion, AnimatePresence, MotionValue } from 'framer-motion';
 import Marquee from '@/components/Marquee';
 import PricingSection from '@/components/PricingSection';
+import FeaturedWork from '@/components/FeaturedWork';
 
 /* ─── Lazy-load the heavy WebGL hero so it doesn't block initial render ─── */
 const CardHero = dynamic(() => import('@/components/CardHero'), {
@@ -218,108 +219,6 @@ function TechRibbon() {
         speed={40}
         itemClassName="font-mono text-[11px] tracking-[0.2em] text-gray-400 px-2"
       />
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════
-   FEATURED WORK
-═══════════════════════════════════════════════════════════ */
-function FeaturedWork() {
-  const shouldReduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const mockupY      = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [100, -100]);
-  const mockupRotate = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [4, -4]);
-
-  return (
-    <section id="work" ref={ref} className="relative py-20 px-6">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-        >
-          <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Featured Work</p>
-          <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">Recent build.</h2>
-        </motion.div>
-
-        <motion.div
-          className="relative bg-black rounded-3xl overflow-hidden shadow-2xl"
-          style={{ y: mockupY, rotate: mockupRotate, transformStyle: 'preserve-3d' }}
-        >
-          {/* Browser chrome */}
-          <div className="bg-zinc-900 px-4 py-3 flex items-center gap-2 border-b border-zinc-800">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 bg-red-500/70 rounded-full" />
-              <div className="w-2.5 h-2.5 bg-yellow-500/70 rounded-full" />
-              <div className="w-2.5 h-2.5 bg-green-500/70 rounded-full" />
-            </div>
-            <div className="ml-4 text-xs font-mono text-gray-500">ruined-visions-site.vercel.app</div>
-          </div>
-
-          {/* Mockup content */}
-          <div className="relative h-[400px] md:h-[500px] bg-gradient-to-b from-zinc-900 to-black flex flex-col items-center justify-center text-center p-8">
-            <div className="absolute inset-0 opacity-30">
-              <div className="absolute top-1/4 left-1/4 w-0.5 h-0.5 bg-white rounded-full" />
-              <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-white rounded-full" />
-              <div className="absolute bottom-1/4 left-1/2 w-0.5 h-0.5 bg-white rounded-full" />
-              <div className="absolute top-1/2 right-1/4 w-0.5 h-0.5 bg-white rounded-full" />
-              <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-white rounded-full" />
-            </div>
-            <div className="text-white text-3xl md:text-5xl font-black tracking-widest mb-4 relative z-10">
-              RUINED VISIONS
-            </div>
-            <div className="text-orange-400 text-xs font-mono tracking-[0.4em] uppercase relative z-10">
-              Drop · July 17 · 8PM EST
-            </div>
-            <div className="mt-8 px-6 py-2 border border-white/30 text-white text-xs font-mono tracking-widest uppercase relative z-10">
-              57 Days · 14 Hrs · 22 Min
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <Stat label="Build time"  value="3 weeks"   />
-          <Stat label="Integrations" value="10+"      />
-          <Stat label="Tech stack"  value="Next.js 16" />
-          <Stat label="Status"      value="Pre-launch" />
-        </motion.div>
-
-        <motion.div
-          className="mt-8 text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <a
-            href="https://ruined-visions-site.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-8 py-3.5 border-2 border-black text-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition-colors"
-          >
-            View live site →
-          </a>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="text-center">
-      <div className="text-2xl md:text-3xl font-extrabold mb-1">{value}</div>
-      <div className="text-xs font-mono tracking-widest uppercase text-gray-500">{label}</div>
     </div>
   );
 }

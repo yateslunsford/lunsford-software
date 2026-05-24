@@ -19,6 +19,7 @@ import {
   useReducedMotion,
   type MotionValue,
 } from 'framer-motion';
+import MagneticCTA from '@/components/MagneticCTA';
 
 /* ═══════════════════════════════════════════════════════════════════════
    ACT TIMING — every number is a scrollYProgress checkpoint (0 → 1).
@@ -391,107 +392,6 @@ function BusinessCard({
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   MagneticCTA — Act III button. Translates toward cursor with a
-   spring; arrow slides on hover; outline carries a slow glow loop.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-function MagneticCTA({
-  scrambledTagline,
-  reduceMotion,
-}: {
-  scrambledTagline: string;
-  reduceMotion: boolean;
-}) {
-  const ref = useRef<HTMLAnchorElement>(null);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const x = useSpring(mx, { stiffness: 200, damping: 18, mass: 0.4 });
-  const y = useSpring(my, { stiffness: 200, damping: 18, mass: 0.4 });
-  const [hovering, setHovering] = useState(false);
-
-  const handleMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (reduceMotion) return;
-    const r = ref.current?.getBoundingClientRect();
-    if (!r) return;
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    mx.set((e.clientX - cx) * 0.35);
-    my.set((e.clientY - cy) * 0.45);
-  };
-
-  const handleLeave = () => {
-    setHovering(false);
-    mx.set(0);
-    my.set(0);
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-5">
-      <p
-        className="text-gray-700 text-base md:text-xl font-normal max-w-xl mx-auto leading-relaxed font-mono tracking-tight text-center px-6"
-      >
-        {scrambledTagline}
-      </p>
-
-      <motion.a
-        ref={ref}
-        href="#contact"
-        onMouseMove={handleMove}
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={handleLeave}
-        style={{ x, y }}
-        className="group relative inline-flex items-center gap-3 px-9 py-4 rounded-full bg-black text-white text-sm font-semibold tracking-wide overflow-hidden"
-      >
-        {/* Glow ring — animated infinite loop */}
-        <motion.span
-          aria-hidden="true"
-          className="absolute -inset-px rounded-full pointer-events-none"
-          style={{
-            background:
-              'conic-gradient(from 0deg, rgba(255,140,60,0) 0%, rgba(255,140,60,0.85) 25%, rgba(255,140,60,0) 50%, rgba(255,140,60,0.85) 75%, rgba(255,140,60,0) 100%)',
-            filter: 'blur(8px)',
-            opacity: hovering ? 0.9 : 0.55,
-          }}
-          animate={reduceMotion ? undefined : { rotate: 360 }}
-          transition={reduceMotion ? undefined : { duration: 6, ease: 'linear', repeat: Infinity }}
-        />
-        {/* Inner mask so the glow rims the button instead of filling it */}
-        <span
-          aria-hidden="true"
-          className="absolute inset-[2px] rounded-full bg-black"
-        />
-        {/* Hover sweep highlight */}
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 rounded-full pointer-events-none transition-opacity duration-300"
-          style={{
-            background:
-              'linear-gradient(110deg, transparent 30%, rgba(255,140,60,0.18) 50%, transparent 70%)',
-            opacity: hovering ? 1 : 0,
-          }}
-        />
-
-        <span className="relative z-10">Start a project</span>
-
-        {/* Arrow — slides on hover, settles back. Uses CSS group-hover */}
-        <span className="relative z-10 overflow-hidden inline-block w-5 h-4">
-          <span className="absolute inset-0 flex items-center transition-transform duration-300 ease-out group-hover:translate-x-6">
-            →
-          </span>
-          <span className="absolute inset-0 flex items-center -translate-x-6 transition-transform duration-300 ease-out group-hover:translate-x-0">
-            →
-          </span>
-        </span>
-      </motion.a>
-
-      <p className="font-mono text-[10px] tracking-[0.4em] uppercase text-gray-500">
-        15-min call · no pitch deck
-      </p>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
    CardHero — three-act cinematic. 250vh container, sticky stage.
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -740,7 +640,15 @@ export default function CardHero() {
             y: ctaY,
           }}
         >
-          <MagneticCTA scrambledTagline={scrambled} reduceMotion={reduceMotion} />
+          <div className="flex flex-col items-center gap-5">
+            <p className="text-gray-700 text-base md:text-xl font-normal max-w-xl mx-auto leading-relaxed font-mono tracking-tight text-center px-6">
+              {scrambled}
+            </p>
+            <MagneticCTA label="Start a project" href="#contact" reduceMotion={reduceMotion} />
+            <p className="font-mono text-[10px] tracking-[0.4em] uppercase text-gray-500">
+              15-min call · no pitch deck
+            </p>
+          </div>
         </motion.div>
 
         {/* ── Faint scroll hint (just a tick mark, no "scroll down ↓") ── */}
