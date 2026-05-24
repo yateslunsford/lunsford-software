@@ -65,7 +65,7 @@ export default function FeaturedWork() {
         // Solid dark for the section body, fading to the next section's
         // background (#fafafa from FactsRibbon) in the last 15% of height.
         background:
-          'linear-gradient(to bottom, #060606 0%, #060606 85%, #fafafa 100%)',
+          'linear-gradient(to bottom, #060606 0%, #060606 88%, #fafafa 100%)',
       }}
     >
       {/* ── 180vh driver — sticky inside paints the cards ── */}
@@ -126,10 +126,11 @@ export default function FeaturedWork() {
               bottom: 0,
               left: 0,
               right: 0,
-              height: '120px',
-              background: 'linear-gradient(to bottom, transparent, #060606)',
+              height: '140px',
+              background:
+                'linear-gradient(to bottom, rgba(6,6,6,0) 0%, rgba(6,6,6,0.4) 40%, rgba(6,6,6,0.95) 100%)',
               pointerEvents: 'none',
-              zIndex: 10,
+              zIndex: 15,
             }}
             aria-hidden="true"
           />
@@ -139,12 +140,12 @@ export default function FeaturedWork() {
           <motion.div
             style={{
               position: 'absolute',
-              bottom: '6vh',
+              bottom: '12vh',
               left: 0,
               right: 0,
               display: 'flex',
               justifyContent: 'center',
-              zIndex: 30,
+              zIndex: 20,
               opacity: ctaOpacity,
               y: ctaY,
             }}
@@ -233,7 +234,8 @@ function ProjectCard({
         x,
         opacity,
         width: '70vw',
-        height: 'min(58vh, 480px)',
+        height: 'clamp(380px, 55vh, 480px)',
+        marginBottom: '100px',
         background: project.color,
         borderRadius: '20px',
         border: `1px solid ${hexToRgba(project.accentColor, 0.15)}`,
