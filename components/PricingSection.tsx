@@ -1,16 +1,10 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import gsap from 'gsap';
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useInView,
-  MotionValue,
-} from 'framer-motion';
+import { motion } from 'framer-motion';
 
-/* ─── Tier data ─── */
+/* ─── Tier definitions ─── */
 export const TIERS = [
   {
     index: 0,
@@ -58,68 +52,80 @@ export const TIERS = [
 
 type Tier = (typeof TIERS)[number];
 
-/* power3.out ≈ cubic-bezier(0.22, 1, 0.36, 1) */
-const POWER3_OUT = [0.22, 1, 0.36, 1] as const;
+/* ─── Static base transforms — the ALWAYS-ON fan positions ─── */
+const BASE: Record<number, { x: number; rotate: number; scale: number; opacity: number }> = {
+  0: { x: -40, rotate: -6, scale: 0.92, opacity: 0.82 }, // Starter
+  1: { x: 0,   rotate: 0,  scale: 1.05, opacity: 1.0  }, // Pro
+  2: { x: 40,  rotate: 6,  scale: 0.92, opacity: 0.82 }, // Custom
+};
 
-/* ─── Desktop ServiceCard ─── */
-function ServiceCard({
+/* Derive animate-target based on hover state */
+function cardState(index: number, hovered: number | null) {
+  const base = BASE[index];
+  // Only react to side-card hover (not Pro itself)
+  const sideHovered = hovered !== null && hovered !== 1;
+
+  if (!sideHovered) return base;
+
+  if (index === hovered) {
+    // This side card is being hovered — advance
+    return { x: 0, rotate: 0, scale: 1.02, opacity: 1 };
+  }
+  if (index === 1) {
+    // Pro retreats while a side card is hovered
+    return { x: 0, rotate: 0, scale: 0.97, opacity: 0.88 };
+  }
+  // The other, un-hovered side card fades further back
+  return { ...base, opacity: 0.55 };
+}
+
+/* power3.out ≈ cubic-bezier(0.22, 1, 0.36, 1) */
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* ─── Desktop card ─── */
+function DesktopCard({
   tier,
-  progress,
-  hoveredIndex,
+  hovered,
   onHoverStart,
   onHoverEnd,
   onSelect,
 }: {
   tier: Tier;
-  progress: MotionValue<number>;
-  hoveredIndex: number | null;
+  hovered: number | null;
   onHoverStart: () => void;
   onHoverEnd: () => void;
   onSelect: () => void;
 }) {
-  const POSITIONS = [-340, 0, 340] as const;
-  const ROTATIONS = [-8, 0, 8] as const;
   const { index, title, price, tag, features, featured } = tier;
-
-  /* Scroll-driven fan-out */
-  const x       = useTransform(progress, [0.15, 0.55], [0, POSITIONS[index]]);
-  const rotate  = useTransform(progress, [0.15, 0.55], [0, ROTATIONS[index]]);
-  const z       = useTransform(progress, [0.15, 0.55], [-index * 20, 0]);
-  /* Opacity: fade out when section exits, always opaque at entry
-     (GSAP handles the entrance; Framer Motion handles the exit) */
-  const opacity = useTransform(progress, [0, 0.9, 1], [1, 1, 0]);
-
-  /* Hover swap: side cards advance, center retreats */
-  const isSideHovered = hoveredIndex !== null && hoveredIndex !== 1;
-  const retreatScale  = featured && isSideHovered ? 0.93 : 1;
+  const target = cardState(index, hovered);
 
   return (
     /*
-     * Outer div: GSAP animates translateY (entrance drop).
-     * Inner motion.div: Framer Motion handles x / rotate / z / opacity.
-     * Keeping them on separate elements avoids transform conflicts.
+     * Outer .card-wrapper: GSAP targets this for the y-drop entrance.
+     * Inner motion.div: Framer Motion owns x / rotate / scale / opacity.
+     * Different elements → zero transform conflict.
      */
-    <div
-      className="card-drop-wrapper"
-      style={{
-        position: 'absolute',
-        zIndex: featured ? 10 : 5,
-        transformStyle: 'preserve-3d',
-      }}
-    >
+    <div className="card-wrapper" style={{ zIndex: featured ? 10 : 5 }}>
       <motion.div
-        className={`w-72 md:w-80 p-6 rounded-2xl border select-none ${
+        /*
+         * initial = base fan position so there is no layout-shift on mount.
+         * animate = hover-driven target; Framer Motion diffs and transitions.
+         */
+        initial={BASE[index]}
+        animate={target}
+        transition={{ duration: 0.38, ease: EASE }}
+        onMouseEnter={onHoverStart}
+        onMouseLeave={onHoverEnd}
+        className={`relative w-64 md:w-72 p-6 rounded-2xl border cursor-default select-none ${
           featured
-            ? 'bg-black text-white border-black shadow-2xl'
+            ? 'bg-black text-white border-transparent shadow-2xl'
             : 'bg-white text-black border-black/10 shadow-2xl'
         }`}
-        style={{ x, rotate, z, opacity, transformStyle: 'preserve-3d' }}
-        /* Hover swap */
-        animate={{ scale: retreatScale }}
-        whileHover={!featured ? { scale: 1.04 } : undefined}
-        transition={{ duration: 0.38, ease: POWER3_OUT }}
-        onHoverStart={onHoverStart}
-        onHoverEnd={onHoverEnd}
+        style={
+          featured
+            ? { boxShadow: '0 0 0 1px rgba(251,146,60,0.35), 0 25px 50px rgba(0,0,0,0.35)' }
+            : undefined
+        }
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-5 gap-2">
@@ -130,13 +136,14 @@ function ServiceCard({
           >
             {tag}
           </span>
+
           {featured && (
             <motion.span
-              className="shrink-0 text-[10px] font-mono uppercase bg-orange-400 text-black px-2 py-1 rounded-full"
-              animate={{ scale: [1, 1.07, 1] }}
-              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+              className="shrink-0 text-[10px] font-mono font-semibold uppercase bg-orange-400 text-black px-2 py-1 rounded-full"
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
             >
-              Popular
+              Most Popular
             </motion.span>
           )}
         </div>
@@ -147,7 +154,7 @@ function ServiceCard({
           {price}
         </div>
 
-        {/* Features */}
+        {/* Feature list */}
         <ul className="space-y-2.5 mb-6">
           {features.map((f, i) => (
             <li
@@ -174,13 +181,18 @@ function ServiceCard({
           Start with {title} →
         </button>
 
-        {/* Pro card: animated border glow */}
+        {/* Pro: animated orange border glow overlay */}
         {featured && (
           <motion.div
             className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{ border: '1px solid rgba(251,146,60,0)' }}
-            animate={{ borderColor: ['rgba(251,146,60,0)', 'rgba(251,146,60,0.5)', 'rgba(251,146,60,0)'] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{
+              boxShadow: [
+                '0 0 0 1px rgba(251,146,60,0.2)',
+                '0 0 0 1px rgba(251,146,60,0.6)',
+                '0 0 0 1px rgba(251,146,60,0.2)',
+              ],
+            }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
       </motion.div>
@@ -188,17 +200,22 @@ function ServiceCard({
   );
 }
 
-/* ─── Mobile card (scroll-snap carousel) ─── */
+/* ─── Mobile card (shared by carousel) ─── */
 function MobileCard({ tier, onSelect }: { tier: Tier; onSelect: () => void }) {
   const { title, price, tag, features, featured } = tier;
 
   return (
     <div
-      className={`snap-center shrink-0 w-[300px] p-6 rounded-2xl border ${
+      className={`snap-center shrink-0 w-[290px] p-6 rounded-2xl border ${
         featured
-          ? 'bg-black text-white border-black shadow-2xl'
+          ? 'bg-black text-white border-transparent shadow-2xl'
           : 'bg-white text-black border-black/10 shadow-2xl'
       }`}
+      style={
+        featured
+          ? { boxShadow: '0 0 0 1px rgba(251,146,60,0.35), 0 20px 40px rgba(0,0,0,0.3)' }
+          : undefined
+      }
     >
       <div className="flex items-start justify-between mb-5 gap-2">
         <span
@@ -209,8 +226,8 @@ function MobileCard({ tier, onSelect }: { tier: Tier; onSelect: () => void }) {
           {tag}
         </span>
         {featured && (
-          <span className="shrink-0 text-[10px] font-mono uppercase bg-orange-400 text-black px-2 py-1 rounded-full">
-            Popular
+          <span className="shrink-0 text-[10px] font-mono font-semibold uppercase bg-orange-400 text-black px-2 py-1 rounded-full">
+            Most Popular
           </span>
         )}
       </div>
@@ -252,118 +269,121 @@ export default function PricingSection({
 }: {
   onTierSelect: (t: { tier: string; price: string }) => void;
 }) {
-  const desktopRef  = useRef<HTMLDivElement>(null);
+  const sectionRef   = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const carouselRef  = useRef<HTMLDivElement>(null);
+  const hasAnimated  = useRef(false);
 
-  /* Scroll progress drives the desktop fan-out */
-  const { scrollYProgress } = useScroll({ target: desktopRef, offset: ['start start', 'end end'] });
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.1, 0.85, 1], [0, 1, 1, 0]);
+  const [hovered, setHovered] = useState<number | null>(null);
 
-  /* Hover swap state */
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  /*
+   * useLayoutEffect runs synchronously before the browser paints.
+   * GSAP.set moves cards to y:-200 immediately, so there is no
+   * single-frame flash of cards at y:0 before the entrance fires.
+   */
+  useLayoutEffect(() => {
+    const wrappers = containerRef.current?.querySelectorAll<HTMLElement>('.card-wrapper');
+    if (wrappers) gsap.set(Array.from(wrappers), { y: -200 });
+  }, []);
 
-  /* Trigger GSAP entrance once the desktop section enters the viewport */
-  const isInView    = useInView(desktopRef, { once: true, margin: '-3% 0px' });
-  const hasAnimated = useRef(false);
-
+  /*
+   * IntersectionObserver fires the entrance once the section scrolls into
+   * view. Uses browser-native IO (not GSAP ScrollTrigger) so it is fully
+   * compatible with Lenis smooth-scroll.
+   */
   useEffect(() => {
-    if (!isInView || hasAnimated.current || !containerRef.current) return;
-    hasAnimated.current = true;
+    const section = sectionRef.current;
+    const container = containerRef.current;
+    if (!section || !container) return;
 
-    const wrappers = Array.from(
-      containerRef.current.querySelectorAll<HTMLElement>('.card-drop-wrapper'),
-    );
-    if (wrappers.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting || hasAnimated.current) return;
+        hasAnimated.current = true;
 
-    /*
-     * power3.out entrance:
-     *   Center card (index 1) drops first.
-     *   Side cards fan out 120 ms later — feels like the center "throws" them.
-     * stagger from: 'center' gives us this ordering automatically.
-     */
-    gsap.fromTo(
-      wrappers,
-      { y: -180 },
-      {
-        y: 0,
-        duration: 0.9,
-        ease: 'power3.out',
-        stagger: { each: 0.12, from: 'center' },
-        /* Clean up the inline transform once done so Framer Motion owns it */
-        onComplete: () => gsap.set(wrappers, { clearProps: 'transform' }),
+        const wrappers = Array.from(container.querySelectorAll<HTMLElement>('.card-wrapper'));
+
+        /*
+         * Pro (index 1, center) drops first — stagger from:'center' handles
+         * ordering automatically: center → sides at +120ms each.
+         */
+        gsap.to(wrappers, {
+          y: 0,
+          duration: 0.9,
+          ease: 'power3.out',
+          stagger: { each: 0.12, from: 'center' },
+          /*
+           * After the entrance completes, clear the GSAP inline transform so
+           * Framer Motion can own the element transforms cleanly.
+           */
+          onComplete: () => gsap.set(wrappers, { clearProps: 'transform' }),
+        });
+
+        observer.disconnect();
       },
+      { rootMargin: '-5% 0px', threshold: 0 },
     );
-  }, [isInView]);
 
-  /* Auto-scroll mobile carousel to the Pro (center) card on mount */
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  /* Mobile: auto-scroll carousel to Pro card on mount */
   useEffect(() => {
     const carousel = carouselRef.current;
     if (!carousel) return;
-    /* Pro card is the second item; offset ≈ card width + gap */
     const proCard = carousel.children[1] as HTMLElement | undefined;
-    if (proCard) {
-      carousel.scrollTo({ left: proCard.offsetLeft - (carousel.offsetWidth - proCard.offsetWidth) / 2, behavior: 'auto' });
-    }
+    if (!proCard) return;
+    carousel.scrollTo({
+      left: proCard.offsetLeft - (carousel.offsetWidth - proCard.offsetWidth) / 2,
+      behavior: 'auto',
+    });
   }, []);
 
   return (
-    <section id="services">
+    <section id="services" ref={sectionRef} className="py-20 px-6">
+
+      {/* Section header */}
+      <div className="text-center mb-12">
+        <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Services</p>
+        <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">
+          Three ways to work together.
+        </h2>
+      </div>
+
+      {/* ── Desktop: flex row, fan transforms, always visible ── */}
+      <div
+        ref={containerRef}
+        className="hidden md:flex items-center justify-center max-w-5xl mx-auto"
+        style={{ perspective: '1500px', gap: '1rem' }}
+      >
+        {TIERS.map((tier) => (
+          <DesktopCard
+            key={tier.index}
+            tier={tier}
+            hovered={hovered}
+            onHoverStart={() => setHovered(tier.index)}
+            onHoverEnd={() => setHovered(null)}
+            onSelect={() => onTierSelect({ tier: tier.title, price: tier.price })}
+          />
+        ))}
+      </div>
 
       {/* ── Mobile: horizontal scroll-snap carousel ── */}
-      <div className="md:hidden py-20 px-6">
-        <div className="text-center mb-10">
-          <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Services</p>
-          <h2 className="text-4xl font-extrabold tracking-tight">Three ways to work together.</h2>
-        </div>
-        <div
-          ref={carouselRef}
-          className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {TIERS.map((t) => (
-            <MobileCard
-              key={t.index}
-              tier={t}
-              onSelect={() => onTierSelect({ tier: t.title, price: t.price })}
-            />
-          ))}
-        </div>
+      <div
+        ref={carouselRef}
+        className="md:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6"
+        style={{ scrollbarWidth: 'none' }}
+      >
+        {TIERS.map((tier) => (
+          <MobileCard
+            key={tier.index}
+            tier={tier}
+            onSelect={() => onTierSelect({ tier: tier.title, price: tier.price })}
+          />
+        ))}
       </div>
 
-      {/* ── Desktop: sticky scroll-driven fan-out ── */}
-      <div ref={desktopRef} className="hidden md:block relative h-[300vh]">
-        <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-6">
-
-          {/* Section header */}
-          <motion.div className="text-center mb-7" style={{ opacity: headerOpacity }}>
-            <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Services</p>
-            <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-              Three ways to work together.
-            </h2>
-          </motion.div>
-
-          {/* Card container — GSAP scope */}
-          <div
-            ref={containerRef}
-            className="relative flex items-center justify-center w-full max-w-6xl"
-            style={{ perspective: '1500px' }}
-          >
-            {TIERS.map((t) => (
-              <ServiceCard
-                key={t.index}
-                tier={t}
-                progress={scrollYProgress}
-                hoveredIndex={hoveredIndex}
-                onHoverStart={() => setHoveredIndex(t.index)}
-                onHoverEnd={() => setHoveredIndex(null)}
-                onSelect={() => onTierSelect({ tier: t.title, price: t.price })}
-              />
-            ))}
-          </div>
-
-        </div>
-      </div>
     </section>
   );
 }

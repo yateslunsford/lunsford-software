@@ -1,20 +1,16 @@
 'use client';
 
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { RoundedBox, Text, Sparkles } from '@react-three/drei';
 import {
   useScroll,
   useTransform,
   motion,
-  transform,
-  MotionValue,
   useMotionValue,
   useSpring,
   useMotionTemplate,
   useMotionValueEvent,
+  animate,
 } from 'framer-motion';
-import * as THREE from 'three';
 
 /* ─── Text scramble hook ─── */
 const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·—!@#';
@@ -55,61 +51,175 @@ function useScramble(target: string, active: boolean): string {
   return text;
 }
 
-/* ─── 3D spinning business card ─── */
-function Card({ progress }: { progress: MotionValue<number> }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const { viewport } = useThree();
-  const baseScale = Math.max(0.55, Math.min((viewport.width * 0.55) / 3.5, 0.95));
+/* ─── CSS 3D Business Card ─── */
+function BusinessCard({ scrollYProgress }: { scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress'] }) {
+  const rotateY = useMotionValue(0);
+  const cardY = useTransform(scrollYProgress, [0, 1], [0, -80]);
+  const cardScale = useTransform(scrollYProgress, [0, 0.8], [1, 0.85]);
+  const scrollTilt = useTransform(scrollYProgress, [0, 0.5], [0, 12]);
 
-  useFrame(() => {
-    if (!groupRef.current) return;
-    const p = progress.get();
-    const rotY = transform(p,
-      [0, 0.1, 0.25, 0.45, 0.65, 0.85, 0.93, 1],
-      [0, 0.14, Math.PI, Math.PI * 4, Math.PI * 6, Math.PI * 7.6, Math.PI * 7.99, Math.PI * 8],
-    );
-    const rotX = transform(p,
-      [0, 0.1, 0.25, 0.4, 0.55, 0.7, 0.85, 0.93, 1],
-      [0, 0.14, 0.44, -0.61, 0.78, -0.52, 0.35, 0.09, 0],
-    );
-    const rotZ = transform(p,
-      [0, 0.15, 0.3, 0.5, 0.65, 0.8, 0.93, 1],
-      [0, 0.09, -0.3, 0.42, -0.34, 0.2, 0.07, 0],
-    );
-    const posY = transform(p,
-      [0, 0.1, 0.4, 0.7, 0.9, 0.93, 1],
-      [0, 0.1, 0.25, 0.3, 0.15, 0, 0],
-    );
-    const animScale = transform(p,
-      [0, 0.1, 0.4, 0.85, 0.92, 0.95, 1],
-      [1, 1.05, 1.1, 1.05, 1.0, 1.08, 1.0],
-    );
-    groupRef.current.rotation.y = rotY;
-    groupRef.current.rotation.x = rotX;
-    groupRef.current.rotation.z = rotZ;
-    groupRef.current.position.y = posY;
-    groupRef.current.scale.setScalar(baseScale * animScale);
-  });
+  useEffect(() => {
+    const controls = animate(rotateY, 360, {
+      duration: 9,
+      ease: 'linear',
+      repeat: Infinity,
+    });
+    return controls.stop;
+  }, [rotateY]);
+
+  const cardStyle: React.CSSProperties = {
+    width: 'clamp(280px, 38vw, 500px)',
+    aspectRatio: '1.75',
+    position: 'relative',
+    transformStyle: 'preserve-3d',
+  };
+
+  const faceBase: React.CSSProperties = {
+    position: 'absolute',
+    inset: 0,
+    borderRadius: '16px',
+    backfaceVisibility: 'hidden',
+    WebkitBackfaceVisibility: 'hidden',
+  };
 
   return (
-    <group ref={groupRef}>
-      <RoundedBox args={[3.5, 2, 0.05]} radius={0.08} smoothness={4}>
-        <meshStandardMaterial color="#ffffff" roughness={0.3} metalness={0.05} />
-      </RoundedBox>
-      <Text position={[-1.4, 0.55, 0.026]} fontSize={0.32} color="#0a0a0a" anchorX="left" anchorY="middle" letterSpacing={-0.03}>LUNSFORD</Text>
-      <Text position={[-1.4, 0.27, 0.026]} fontSize={0.075} color="#666666" anchorX="left" anchorY="middle" letterSpacing={0.3}>SOFTWARE DEVELOPMENT</Text>
-      <mesh position={[1.45, 0.55, 0.026]}>
-        <torusGeometry args={[0.15, 0.008, 16, 32]} />
-        <meshStandardMaterial color="#444444" />
-      </mesh>
-      <Text position={[1.45, 0.55, 0.027]} fontSize={0.1} color="#666666" anchorX="center" anchorY="middle">LS</Text>
-      <Text position={[-1.4, -0.75, 0.026]} fontSize={0.075} color="#888888" anchorX="left" anchorY="middle" letterSpacing={0.12}>EST. 2026 · NEWNAN, GA</Text>
-      <Text position={[1.4, -0.75, 0.026]} fontSize={0.075} color="#888888" anchorX="right" anchorY="middle" letterSpacing={0.05}>ylunsford1@gmail.com</Text>
-      <group rotation={[0, Math.PI, 0]}>
-        <Text position={[0, 0.18, 0.026]} fontSize={0.1} color="#666666" anchorX="center" anchorY="middle" letterSpacing={0.35}>CUSTOM WEBSITES</Text>
-        <Text position={[0, -0.15, 0.026]} fontSize={0.38} color="#0a0a0a" anchorX="center" anchorY="middle" letterSpacing={-0.025}>Built right.</Text>
-      </group>
-    </group>
+    <motion.div
+      style={{
+        y: cardY,
+        scale: cardScale,
+        rotateX: scrollTilt,
+        perspective: 1200,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+      }}
+    >
+      <motion.div style={{ ...cardStyle, rotateY }}>
+
+        {/* Front Face */}
+        <div
+          style={{
+            ...faceBase,
+            background: '#f8f8f6',
+            boxShadow: '0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)',
+            padding: 'clamp(18px, 3vw, 32px)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Top row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <p style={{
+                fontFamily: 'var(--font-geist-sans, system-ui), sans-serif',
+                fontWeight: 800,
+                fontSize: 'clamp(1rem, 2.2vw, 1.5rem)',
+                color: '#0a0a0a',
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+                margin: 0,
+              }}>LUNSFORD</p>
+              <p style={{
+                fontFamily: 'var(--font-geist-mono, monospace)',
+                fontWeight: 400,
+                fontSize: 'clamp(0.38rem, 0.75vw, 0.55rem)',
+                color: '#888',
+                letterSpacing: '0.28em',
+                marginTop: '4px',
+                margin: '4px 0 0 0',
+              }}>SOFTWARE DEVELOPMENT</p>
+            </div>
+            {/* LS monogram */}
+            <div style={{
+              width: 'clamp(28px, 3.5vw, 42px)',
+              height: 'clamp(28px, 3.5vw, 42px)',
+              borderRadius: '50%',
+              border: '1.5px solid #ccc',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <span style={{
+                fontFamily: 'var(--font-geist-sans, system-ui)',
+                fontWeight: 700,
+                fontSize: 'clamp(0.5rem, 1vw, 0.7rem)',
+                color: '#555',
+                letterSpacing: '-0.02em',
+              }}>LS</span>
+            </div>
+          </div>
+
+          {/* Center accent line */}
+          <div style={{
+            height: '1px',
+            background: 'linear-gradient(to right, #e0e0e0, transparent)',
+            margin: '0',
+          }} />
+
+          {/* Bottom row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <p style={{
+              fontFamily: 'var(--font-geist-mono, monospace)',
+              fontSize: 'clamp(0.35rem, 0.65vw, 0.5rem)',
+              color: '#aaa',
+              letterSpacing: '0.12em',
+              margin: 0,
+            }}>EST. 2026 · NEWNAN, GA</p>
+            <p style={{
+              fontFamily: 'var(--font-geist-mono, monospace)',
+              fontSize: 'clamp(0.35rem, 0.65vw, 0.5rem)',
+              color: '#aaa',
+              letterSpacing: '0.05em',
+              margin: 0,
+            }}>ylunsford1@gmail.com</p>
+          </div>
+        </div>
+
+        {/* Back Face */}
+        <div
+          style={{
+            ...faceBase,
+            background: '#0a0a0a',
+            boxShadow: '0 30px 80px rgba(0,0,0,0.55)',
+            transform: 'rotateY(180deg)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            border: '1px solid rgba(255,255,255,0.07)',
+          }}
+        >
+          <p style={{
+            fontFamily: 'var(--font-geist-mono, monospace)',
+            fontSize: 'clamp(0.38rem, 0.75vw, 0.55rem)',
+            color: '#555',
+            letterSpacing: '0.35em',
+            margin: 0,
+          }}>CUSTOM WEBSITES</p>
+          <p style={{
+            fontFamily: 'var(--font-geist-sans, system-ui)',
+            fontWeight: 800,
+            fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
+            color: '#f8f8f6',
+            letterSpacing: '-0.03em',
+            margin: 0,
+            lineHeight: 1,
+          }}>Built right.</p>
+          <div style={{
+            width: '32px',
+            height: '1px',
+            background: 'rgba(255,140,60,0.6)',
+            marginTop: '4px',
+          }} />
+        </div>
+
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -118,25 +228,25 @@ export default function CardHero() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
 
-  /* Existing CTA reveal */
-  const textOpacity        = useTransform(scrollYProgress, [0.88, 0.98], [0, 1]);
-  const textY              = useTransform(scrollYProgress, [0.88, 0.98], [20, 0]);
-  const scrollHintOpacity  = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
+  /* CTA reveal */
+  const textOpacity       = useTransform(scrollYProgress, [0.88, 0.98], [0, 1]);
+  const textY             = useTransform(scrollYProgress, [0.88, 0.98], [20, 0]);
+  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
 
-  /* Ghost "BUILT RIGHT" text — drifts upward, fades before CTA appears */
+  /* Ghost "BUILT RIGHT" text */
   const ghostY       = useTransform(scrollYProgress, [0, 0.9], [0, -60]);
   const ghostOpacity = useTransform(scrollYProgress, [0.05, 0.22, 0.72, 0.86], [0, 1, 1, 0]);
 
-  /* Cursor-following glow — spring-smoothed, 60 fps */
-  const rawX = useMotionValue(0.5);
-  const rawY = useMotionValue(0.4);
+  /* Cursor-following glow */
+  const rawX   = useMotionValue(0.5);
+  const rawY   = useMotionValue(0.4);
   const springX = useSpring(rawX, { stiffness: 55, damping: 22 });
   const springY = useSpring(rawY, { stiffness: 55, damping: 22 });
-  const pctX = useTransform(springX, [0, 1], ['0%', '100%']);
-  const pctY = useTransform(springY, [0, 1], ['0%', '100%']);
+  const pctX   = useTransform(springX, [0, 1], ['0%', '100%']);
+  const pctY   = useTransform(springY, [0, 1], ['0%', '100%']);
   const cursorGlow = useMotionTemplate`radial-gradient(circle at ${pctX} ${pctY}, rgba(255,140,60,0.18), transparent 38%)`;
 
-  /* Scramble the tagline the moment it first becomes visible */
+  /* Tagline scramble */
   const [scrambleActive, setScrambleActive] = useState(false);
   const TAGLINE = "Custom websites that don't look like everyone else's.";
   const scrambled = useScramble(TAGLINE, scrambleActive);
@@ -188,7 +298,7 @@ export default function CardHero() {
           }}
         />
 
-        {/* Ghost "BUILT RIGHT" — massive ambient text that drifts on scroll */}
+        {/* Ghost "BUILT RIGHT" ambient text */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
           style={{ y: ghostY, opacity: ghostOpacity }}
@@ -202,20 +312,8 @@ export default function CardHero() {
           </p>
         </motion.div>
 
-        {/* 3D canvas */}
-        <Canvas
-          camera={{ position: [0, 0, 5], fov: 45 }}
-          dpr={[1, 2]}
-          gl={{ antialias: true, alpha: true }}
-          style={{ position: 'absolute', inset: 0 }}
-        >
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[5, 5, 5]} intensity={1.2} color="#ffffff" />
-          <directionalLight position={[-5, 2, 3]} intensity={0.7} color="#ff8c3c" />
-          <pointLight position={[0, -3, 2]} intensity={0.4} color="#ffaa55" />
-          <Card progress={scrollYProgress} />
-          <Sparkles count={150} scale={[14, 13, 5]} size={3} speed={0.4} color="#ffffff" opacity={0.6} />
-        </Canvas>
+        {/* CSS 3D Business Card */}
+        <BusinessCard scrollYProgress={scrollYProgress} />
 
         {/* CTA text — scrambles into existence on scroll reveal */}
         <motion.div
