@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform, useReducedMotion, AnimatePresence, MotionValue } from 'framer-motion';
 import Marquee from '@/components/Marquee';
+import PricingSection from '@/components/PricingSection';
 
 /* ─── Lazy-load the heavy WebGL hero so it doesn't block initial render ─── */
 const CardHero = dynamic(() => import('@/components/CardHero'), {
@@ -46,7 +47,7 @@ export default function Home() {
       {/* ── Tech stack ribbon between Pitch and Services ── */}
       <TechRibbon />
 
-      <Services onTierSelect={(t) => setModalTier(t)} />
+      <PricingSection onTierSelect={(t) => setModalTier(t)} />
       <FeaturedWork />
 
       {/* ── Build-facts ribbon between Work and Process ── */}
@@ -218,169 +219,6 @@ function TechRibbon() {
         itemClassName="font-mono text-[11px] tracking-[0.2em] text-gray-400 px-2"
       />
     </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════
-   SERVICES
-═══════════════════════════════════════════════════════════ */
-const TIERS = [
-  {
-    index: 0,
-    title: 'Starter',
-    price: '$800',
-    tag: 'Get online. Look legit.',
-    features: [
-      '5-page custom site',
-      'Mobile responsive',
-      'Contact form',
-      'SEO foundations',
-      '1-week delivery',
-    ],
-  },
-  {
-    index: 1,
-    title: 'Pro',
-    price: '$2,000',
-    tag: 'Sell, scale, ship drops.',
-    featured: true,
-    features: [
-      'Everything in Starter',
-      'Sanity CMS',
-      'Stripe checkout',
-      'SMS notifications',
-      '2–3 week build',
-    ],
-  },
-  {
-    index: 2,
-    title: 'Custom',
-    price: '$3,500+',
-    tag: 'Build whatever you describe.',
-    features: [
-      'Full custom systems',
-      'Booking & dashboards',
-      'API integrations',
-      'E-commerce',
-      'Ongoing iteration',
-    ],
-  },
-] as const;
-
-type Tier = (typeof TIERS)[number];
-
-function Services({ onTierSelect }: { onTierSelect: (t: { tier: string; price: string }) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.1, 0.85, 1], [0, 1, 1, 0]);
-
-  return (
-    <section id="services" ref={ref} className="relative h-[300vh]">
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden px-6">
-        <motion.div className="text-center mb-7" style={{ opacity: headerOpacity }}>
-          <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Services</p>
-          <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-            Three ways to work together.
-          </h2>
-        </motion.div>
-
-        <div
-          className="relative flex items-center justify-center w-full max-w-6xl"
-          style={{ perspective: '1500px' }}
-        >
-          {TIERS.map((t) => (
-            <ServiceCard
-              key={t.index}
-              tier={t}
-              progress={scrollYProgress}
-              onSelect={() => onTierSelect({ tier: t.title, price: t.price })}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ServiceCard({
-  tier,
-  progress,
-  onSelect,
-}: {
-  tier: Tier;
-  progress: MotionValue<number>;
-  onSelect: () => void;
-}) {
-  const { index, title, price, tag, features } = tier;
-  const featured = 'featured' in tier && tier.featured === true;
-
-  const positions  = [-340, 0, 340] as const;
-  const rotations  = [-8, 0, 8] as const;
-
-  const x       = useTransform(progress, [0.15, 0.55], [0, positions[index]]);
-  const rotate  = useTransform(progress, [0.15, 0.55], [0, rotations[index]]);
-  const z       = useTransform(progress, [0.15, 0.55], [-index * 20, 0]);
-  const opacity = useTransform(progress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
-
-  return (
-    <motion.div
-      className={`absolute w-72 md:w-80 p-6 rounded-2xl border ${
-        featured
-          ? 'bg-black text-white border-black shadow-2xl'
-          : 'bg-white text-black border-black/10 shadow-2xl'
-      }`}
-      style={{ x, rotate, z, opacity, transformStyle: 'preserve-3d', zIndex: featured ? 10 : 5 }}
-    >
-      {/* Header row */}
-      <div className="flex items-start justify-between mb-5 gap-2">
-        <span
-          className={`text-xs font-mono tracking-widest uppercase leading-snug ${
-            featured ? 'text-orange-300' : 'text-gray-400'
-          }`}
-        >
-          {tag}
-        </span>
-        {featured && (
-          <motion.span
-            className="shrink-0 text-[10px] font-mono uppercase bg-orange-400 text-black px-2 py-1 rounded-full"
-            animate={{ scale: [1, 1.06, 1] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            Popular
-          </motion.span>
-        )}
-      </div>
-
-      <h3 className="text-3xl font-extrabold mb-1">{title}</h3>
-      <div className={`text-4xl font-extrabold mb-5 ${featured ? 'text-white' : 'text-black'}`}>
-        {price}
-      </div>
-
-      <ul className="space-y-2.5 mb-6">
-        {features.map((f, i) => (
-          <li
-            key={i}
-            className={`text-sm flex items-start gap-2 ${
-              featured ? 'text-gray-300' : 'text-gray-700'
-            }`}
-          >
-            <span className={featured ? 'text-orange-400' : 'text-black'}>→</span>
-            {f}
-          </li>
-        ))}
-      </ul>
-
-      <button
-        onClick={onSelect}
-        className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors ${
-          featured
-            ? 'bg-orange-400 text-black hover:bg-orange-300'
-            : 'bg-black text-white hover:bg-gray-800'
-        }`}
-      >
-        Start with {title} →
-      </button>
-    </motion.div>
   );
 }
 
