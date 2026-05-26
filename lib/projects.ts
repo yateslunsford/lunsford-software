@@ -6,7 +6,9 @@ export type Project = {
   year: string;
   description: string;
   url: string;
+  /** Card background. Strict B/W palette — all near-black tones. */
   color: string;
+  /** Foreground accent — white or near-white tints. */
   accentColor: string;
   status: 'live' | 'in-progress' | 'concept';
 };
@@ -21,22 +23,35 @@ export const projects: Project[] = [
     description:
       'Full streetwear drop launch platform. Countdown lock, Stripe checkout, Sanity CMS, Twilio SMS blast to 1,000+ signups. Drops July 17.',
     url: 'https://ruined-visions-site.vercel.app',
-    color: '#0a0a0a',
-    accentColor: '#ff4444',
+    color:       '#070707',
+    accentColor: '#ffffff',
     status: 'live',
   },
   {
     slug: 'lunsford-software',
     title: 'Lunsford Software',
-    client: 'Internal',
-    tags: ['Portfolio', 'Next.js', 'Framer Motion', 'GSAP'],
+    client: 'Personal Portfolio',
+    tags: ['Next.js', 'R3F', 'GSAP', 'Vercel'],
     year: '2026',
     description:
-      'The site you are looking at. Built to close deals. Three-act hero, scroll-driven animations, magnetic CTA.',
+      'Personal dev portfolio with cinematic 3D scroll animations and immersive WebGL scenes. Built to stand out.',
     url: '/',
-    color: '#080808',
-    accentColor: '#ff8c3c',
+    color:       '#0a0a0c',
+    accentColor: '#ececec',
     status: 'live',
+  },
+  {
+    slug: 'local-business',
+    title: 'Local Business Web Presence',
+    client: 'Tier-1 Concept',
+    tags: ['Next.js', 'TypeScript', 'Tailwind'],
+    year: '2026',
+    description:
+      'Clean, fast, mobile-first site for a local service business. Built for SEO and real conversions.',
+    url: '#',
+    color:       '#080a0d',
+    accentColor: '#c4c4c4',
+    status: 'in-progress',
   },
   {
     slug: 'buckley-trash',
@@ -47,8 +62,8 @@ export const projects: Project[] = [
     description:
       'Local junk removal business site. Clean, fast, built to rank on Google and convert mobile visitors.',
     url: '#',
-    color: '#1a1a0a',
-    accentColor: '#f5c842',
+    color:       '#050505',
+    accentColor: '#a8a8a8',
     status: 'in-progress',
   },
 ];

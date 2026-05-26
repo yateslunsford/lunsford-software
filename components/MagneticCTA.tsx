@@ -4,9 +4,8 @@ import { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 /* ═══════════════════════════════════════════════════════════
-   MagneticCTA — the button itself. Translates toward the cursor
-   with a spring, carries a slow conic glow loop, and slides its
-   arrow on hover. Reusable across hero, work tour, /work CTA.
+   MagneticCTA — pill button that magnetizes toward the cursor.
+   Carries a slow conic-white halo. Strict B/W palette.
 ═══════════════════════════════════════════════════════════ */
 export default function MagneticCTA({
   label = 'Start a project',
@@ -48,26 +47,32 @@ export default function MagneticCTA({
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={handleLeave}
       style={{ x, y }}
+      animate={
+        reduceMotion
+          ? undefined
+          : { scale: hovering ? 1.045 : 1, boxShadow: hovering
+              ? '0 12px 40px rgba(255,255,255,0.18)'
+              : '0 4px 18px rgba(0,0,0,0.35)' }
+      }
+      transition={reduceMotion ? undefined : { type: 'spring', stiffness: 260, damping: 22 }}
       className="group relative inline-flex items-center gap-3 px-9 py-4 rounded-full bg-black text-white text-sm font-semibold tracking-wide overflow-hidden"
     >
-      {/* Glow ring — animated infinite loop */}
+      {/* Conic white halo — rotates slowly */}
       <motion.span
         aria-hidden="true"
         className="absolute -inset-px rounded-full pointer-events-none"
         style={{
           background:
-            'conic-gradient(from 0deg, rgba(255,140,60,0) 0%, rgba(255,140,60,0.85) 25%, rgba(255,140,60,0) 50%, rgba(255,140,60,0.85) 75%, rgba(255,140,60,0) 100%)',
+            'conic-gradient(from 0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 25%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.95) 75%, rgba(255,255,255,0) 100%)',
           filter: 'blur(8px)',
-          opacity: hovering ? 0.9 : 0.55,
+          opacity: hovering ? 0.95 : 0.55,
         }}
         animate={reduceMotion ? undefined : { rotate: 360 }}
         transition={
-          reduceMotion
-            ? undefined
-            : { duration: 6, ease: 'linear', repeat: Infinity }
+          reduceMotion ? undefined : { duration: 6, ease: 'linear', repeat: Infinity }
         }
       />
-      {/* Inner mask so the glow rims the button instead of filling it */}
+      {/* Inner mask — the halo rims the button instead of filling it */}
       <span
         aria-hidden="true"
         className="absolute inset-[2px] rounded-full bg-black"
@@ -78,7 +83,7 @@ export default function MagneticCTA({
         className="absolute inset-0 rounded-full pointer-events-none transition-opacity duration-300"
         style={{
           background:
-            'linear-gradient(110deg, transparent 30%, rgba(255,140,60,0.18) 50%, transparent 70%)',
+            'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%)',
           opacity: hovering ? 1 : 0,
         }}
       />

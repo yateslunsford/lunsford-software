@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Link from 'next/link';
 import {
   motion,
@@ -18,10 +18,6 @@ const NOISE_SVG = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/20
    /WORK — full portfolio page
 ═══════════════════════════════════════════════════════════ */
 export default function WorkPage() {
-  useEffect(() => {
-    document.title = 'Work — Lunsford Software';
-  }, []);
-
   return (
     <main className="bg-[#060606] text-white min-h-screen">
       <WorkNav />
@@ -42,7 +38,7 @@ function WorkNav() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link
           href="/#work"
-          className="font-mono text-xs tracking-widest uppercase text-white/40 hover:text-white transition-colors"
+          className="font-mono text-xs tracking-widest uppercase text-white/45 hover:text-white transition-colors"
         >
           ← Back
         </Link>
@@ -58,7 +54,7 @@ function WorkNav() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   HEADER — giant "ALL WORK" with hero-style atmosphere
+   HEADER — giant "ALL WORK" with monochrome atmosphere
 ═══════════════════════════════════════════════════════════ */
 function WorkHeader() {
   const reduceMotion = useReducedMotion() ?? false;
@@ -79,12 +75,12 @@ function WorkHeader() {
       ref={ref}
       className="relative h-screen flex flex-col items-center justify-center overflow-hidden"
     >
-      {/* Orange ambient glow */}
+      {/* Cool white ambient bloom — no orange */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 70% 55% at 50% 55%, rgba(255,140,60,0.22), transparent 58%)',
+            'radial-gradient(ellipse 70% 55% at 50% 55%, rgba(255,255,255,0.08), transparent 60%)',
         }}
         aria-hidden="true"
       />
@@ -94,7 +90,7 @@ function WorkHeader() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 60% 50% at 18% 22%, rgba(180,210,255,0.10), transparent 60%)',
+            'radial-gradient(ellipse 60% 50% at 18% 22%, rgba(180,210,255,0.08), transparent 60%)',
         }}
         aria-hidden="true"
       />
@@ -124,25 +120,25 @@ function WorkHeader() {
             fontFamily:
               'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
             fontWeight: 400,
-            letterSpacing: '-0.03em',
-            opacity: 0.9,
+            letterSpacing: '-0.035em',
+            opacity: 0.92,
           }}
           initial={reduceMotion ? false : { opacity: 0, y: 60 }}
-          animate={reduceMotion ? undefined : { opacity: 0.9, y: 0 }}
+          animate={reduceMotion ? undefined : { opacity: 0.92, y: 0 }}
           transition={
             reduceMotion
               ? undefined
-              : { duration: 1.1, ease: [0.16, 1, 0.3, 1] }
+              : { duration: 1.0, ease: [0.16, 1, 0.3, 1] }
           }
         >
           ALL WORK
         </motion.h1>
         <motion.p
-          className="font-mono text-xs md:text-sm tracking-[0.4em] uppercase text-white/45 mt-8"
+          className="font-mono text-xs md:text-sm tracking-[0.45em] uppercase text-white/45 mt-8"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={reduceMotion ? undefined : { opacity: 1 }}
           transition={
-            reduceMotion ? undefined : { duration: 0.8, delay: 0.4 }
+            reduceMotion ? undefined : { duration: 0.8, delay: 0.35 }
           }
         >
           Lunsford Software Development · Est. 2026
@@ -163,12 +159,11 @@ function WorkHeader() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PROJECT GRID — editorial masonry
-   Pattern: index 0 = full-width tall, then split-split, repeat.
+   PROJECT GRID
 ═══════════════════════════════════════════════════════════ */
 function ProjectGrid() {
   return (
-    <section className="relative px-6 py-16 md:py-24">
+    <section className="relative px-6 py-12 md:py-16">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {projects.map((p, i) => {
@@ -189,7 +184,7 @@ function ProjectGrid() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   WORK CARD — hover lift, scroll-in stagger
+   WORK CARD
 ═══════════════════════════════════════════════════════════ */
 function WorkCard({
   project,
@@ -241,7 +236,7 @@ function WorkCard({
       style={{
         height: fullWidth ? 500 : 340,
         background: project.color,
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid rgba(255,255,255,0.10)',
         boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
       }}
     >
@@ -254,7 +249,7 @@ function WorkCard({
 
       {/* Accent corner glow */}
       <div
-        className="absolute -top-32 -right-32 w-96 h-96 pointer-events-none rounded-full transition-opacity duration-500 opacity-60 group-hover:opacity-100"
+        className="absolute -top-32 -right-32 w-96 h-96 pointer-events-none rounded-full transition-opacity duration-500 opacity-50 group-hover:opacity-90"
         style={{
           background: `radial-gradient(circle, ${project.accentColor}33, transparent 70%)`,
         }}
@@ -286,7 +281,7 @@ function WorkCard({
                 fontSize: fullWidth
                   ? 'clamp(2.5rem, 6vw, 6rem)'
                   : 'clamp(1.75rem, 3.5vw, 3.25rem)',
-                letterSpacing: '-0.03em',
+                letterSpacing: '-0.035em',
                 fontFamily:
                   'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
                 fontWeight: 400,
@@ -319,8 +314,8 @@ function WorkCard({
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="font-mono text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full text-white/70"
-              style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+              className="font-mono text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full text-white/75"
+              style={{ border: '1px solid rgba(255,255,255,0.14)' }}
             >
               {tag}
             </span>
@@ -330,7 +325,7 @@ function WorkCard({
         {/* Bottom row */}
         <div className="flex items-end justify-between gap-6">
           <p
-            className={`text-white/55 leading-relaxed ${
+            className={`text-white/60 leading-relaxed ${
               fullWidth ? 'text-sm md:text-base max-w-xl' : 'text-xs md:text-sm max-w-md'
             }`}
           >
@@ -375,13 +370,11 @@ function WorkCard({
 function ViewArrow({ accentColor }: { accentColor: string }) {
   return (
     <div className="relative h-6 w-28 overflow-hidden">
-      {/* Resting state */}
       <span
-        className="absolute inset-0 flex items-center justify-end font-mono text-xs tracking-widest uppercase text-white/60 transition-transform duration-300 ease-out group-hover:-translate-y-full"
+        className="absolute inset-0 flex items-center justify-end font-mono text-xs tracking-widest uppercase text-white/65 transition-transform duration-300 ease-out group-hover:-translate-y-full"
       >
         View →
       </span>
-      {/* Hovered state slides up from below */}
       <span
         className="absolute inset-0 flex items-center justify-end font-mono text-xs tracking-widest uppercase translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"
         style={{ color: accentColor }}
@@ -393,14 +386,14 @@ function ViewArrow({ accentColor }: { accentColor: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   STATUS BADGE — same recipe as the homepage cards
+   STATUS BADGE — strict B/W palette
 ═══════════════════════════════════════════════════════════ */
 function StatusBadge({ status }: { status: Project['status'] }) {
   if (status === 'live') {
     return (
       <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/80">
-        <span className="relative w-1.5 h-1.5 rounded-full bg-green-400">
-          <span className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-70" />
+        <span className="relative w-1.5 h-1.5 rounded-full bg-white">
+          <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-70" />
         </span>
         Live
       </span>
@@ -408,15 +401,15 @@ function StatusBadge({ status }: { status: Project['status'] }) {
   }
   if (status === 'in-progress') {
     return (
-      <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/80">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+      <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/75">
+        <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
         Building
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/60">
-      <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+    <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
       Concept
     </span>
   );
@@ -433,14 +426,14 @@ function StartCTA() {
   return (
     <section
       ref={ref}
-      className="relative bg-[#060606] py-24 md:py-32 px-6 overflow-hidden"
+      className="relative bg-[#060606] py-20 md:py-28 px-6 overflow-hidden"
     >
-      {/* Orange glow atmosphere */}
+      {/* Cool white atmospheric glow — no orange */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,140,60,0.2), transparent 60%)',
+            'radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,255,255,0.10), transparent 60%)',
         }}
         aria-hidden="true"
       />
@@ -448,7 +441,7 @@ function StartCTA() {
 
       <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center gap-8">
         <motion.p
-          className="font-mono text-xs tracking-[0.4em] text-white/40 uppercase"
+          className="font-mono text-xs tracking-[0.45em] text-white/40 uppercase"
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={
             reduceMotion
@@ -468,7 +461,7 @@ function StartCTA() {
             fontFamily:
               'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
             fontWeight: 400,
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.035em',
           }}
           initial={reduceMotion ? false : { opacity: 0, y: 40 }}
           animate={
@@ -527,14 +520,14 @@ function StartCTA() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   BACK TO TOP — small mono wordmark at the page floor
+   BACK TO TOP
 ═══════════════════════════════════════════════════════════ */
 function BackToTop() {
   return (
     <div className="text-center py-10 border-t border-white/5">
       <Link
         href="#"
-        className="font-mono text-xs tracking-widest uppercase text-white/30 hover:text-white/70 transition-colors"
+        className="font-mono text-xs tracking-widest uppercase text-white/30 hover:text-white/75 transition-colors"
       >
         ↑ lunsfordsoftware.com
       </Link>
@@ -543,7 +536,7 @@ function BackToTop() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   NOISE GRAIN — shared atmospheric layer
+   NOISE GRAIN
 ═══════════════════════════════════════════════════════════ */
 function NoiseGrain({ reduceMotion }: { reduceMotion: boolean }) {
   return (

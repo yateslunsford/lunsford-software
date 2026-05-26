@@ -52,37 +52,31 @@ export const TIERS = [
 
 type Tier = (typeof TIERS)[number];
 
-/* ─── Static base transforms — the ALWAYS-ON fan positions ─── */
+/* ─── Static base transforms — the always-on fan positions ─── */
 const BASE: Record<number, { x: number; rotate: number; scale: number; opacity: number }> = {
   0: { x: -40, rotate: -6, scale: 0.92, opacity: 0.82 }, // Starter
   1: { x: 0,   rotate: 0,  scale: 1.05, opacity: 1.0  }, // Pro
   2: { x: 40,  rotate: 6,  scale: 0.92, opacity: 0.82 }, // Custom
 };
 
-/* Derive animate-target based on hover state */
 function cardState(index: number, hovered: number | null) {
   const base = BASE[index];
-  // Only react to side-card hover (not Pro itself)
   const sideHovered = hovered !== null && hovered !== 1;
 
   if (!sideHovered) return base;
 
   if (index === hovered) {
-    // This side card is being hovered — advance
     return { x: 0, rotate: 0, scale: 1.02, opacity: 1 };
   }
   if (index === 1) {
-    // Pro retreats while a side card is hovered
     return { x: 0, rotate: 0, scale: 0.97, opacity: 0.88 };
   }
-  // The other, un-hovered side card fades further back
   return { ...base, opacity: 0.55 };
 }
 
-/* power3.out ≈ cubic-bezier(0.22, 1, 0.36, 1) */
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* ─── Desktop card ─── */
+/* ─── Desktop card — strict B/W palette ─── */
 function DesktopCard({
   tier,
   hovered,
@@ -100,17 +94,8 @@ function DesktopCard({
   const target = cardState(index, hovered);
 
   return (
-    /*
-     * Outer .card-wrapper: GSAP targets this for the y-drop entrance.
-     * Inner motion.div: Framer Motion owns x / rotate / scale / opacity.
-     * Different elements → zero transform conflict.
-     */
     <div className="card-wrapper" style={{ zIndex: featured ? 10 : 5 }}>
       <motion.div
-        /*
-         * initial = base fan position so there is no layout-shift on mount.
-         * animate = hover-driven target; Framer Motion diffs and transitions.
-         */
         initial={BASE[index]}
         animate={target}
         transition={{ duration: 0.38, ease: EASE }}
@@ -118,12 +103,12 @@ function DesktopCard({
         onMouseLeave={onHoverEnd}
         className={`relative w-64 md:w-72 p-6 rounded-2xl border cursor-default select-none ${
           featured
-            ? 'bg-black text-white border-transparent shadow-2xl'
+            ? 'bg-black text-white border-white/20 shadow-2xl'
             : 'bg-white text-black border-black/10 shadow-2xl'
         }`}
         style={
           featured
-            ? { boxShadow: '0 0 0 1px rgba(251,146,60,0.35), 0 25px 50px rgba(0,0,0,0.35)' }
+            ? { boxShadow: '0 0 0 1px rgba(255,255,255,0.30), 0 25px 50px rgba(0,0,0,0.45)' }
             : undefined
         }
       >
@@ -131,7 +116,7 @@ function DesktopCard({
         <div className="flex items-start justify-between mb-5 gap-2">
           <span
             className={`text-xs font-mono tracking-widest uppercase leading-snug ${
-              featured ? 'text-orange-300' : 'text-gray-400'
+              featured ? 'text-white/65' : 'text-gray-400'
             }`}
           >
             {tag}
@@ -139,7 +124,7 @@ function DesktopCard({
 
           {featured && (
             <motion.span
-              className="shrink-0 text-[10px] font-mono font-semibold uppercase bg-orange-400 text-black px-2 py-1 rounded-full"
+              className="shrink-0 text-[10px] font-mono font-semibold uppercase bg-white text-black px-2 py-1 rounded-full"
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
             >
@@ -163,7 +148,7 @@ function DesktopCard({
                 featured ? 'text-gray-300' : 'text-gray-700'
               }`}
             >
-              <span className={featured ? 'text-orange-400' : 'text-black'}>→</span>
+              <span className={featured ? 'text-white' : 'text-black'}>→</span>
               {f}
             </li>
           ))}
@@ -174,22 +159,22 @@ function DesktopCard({
           onClick={onSelect}
           className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors ${
             featured
-              ? 'bg-orange-400 text-black hover:bg-orange-300'
+              ? 'bg-white text-black hover:bg-gray-200'
               : 'bg-black text-white hover:bg-gray-800'
           }`}
         >
           Start with {title} →
         </button>
 
-        {/* Pro: animated orange border glow overlay */}
+        {/* Pro: animated white border glow overlay */}
         {featured && (
           <motion.div
             className="absolute inset-0 rounded-2xl pointer-events-none"
             animate={{
               boxShadow: [
-                '0 0 0 1px rgba(251,146,60,0.2)',
-                '0 0 0 1px rgba(251,146,60,0.6)',
-                '0 0 0 1px rgba(251,146,60,0.2)',
+                '0 0 0 1px rgba(255,255,255,0.18)',
+                '0 0 0 1px rgba(255,255,255,0.55)',
+                '0 0 0 1px rgba(255,255,255,0.18)',
               ],
             }}
             transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
@@ -200,7 +185,7 @@ function DesktopCard({
   );
 }
 
-/* ─── Mobile card (shared by carousel) ─── */
+/* ─── Mobile card ─── */
 function MobileCard({ tier, onSelect }: { tier: Tier; onSelect: () => void }) {
   const { title, price, tag, features, featured } = tier;
 
@@ -208,25 +193,25 @@ function MobileCard({ tier, onSelect }: { tier: Tier; onSelect: () => void }) {
     <div
       className={`snap-center shrink-0 w-[290px] p-6 rounded-2xl border ${
         featured
-          ? 'bg-black text-white border-transparent shadow-2xl'
+          ? 'bg-black text-white border-white/20 shadow-2xl'
           : 'bg-white text-black border-black/10 shadow-2xl'
       }`}
       style={
         featured
-          ? { boxShadow: '0 0 0 1px rgba(251,146,60,0.35), 0 20px 40px rgba(0,0,0,0.3)' }
+          ? { boxShadow: '0 0 0 1px rgba(255,255,255,0.30), 0 20px 40px rgba(0,0,0,0.4)' }
           : undefined
       }
     >
       <div className="flex items-start justify-between mb-5 gap-2">
         <span
           className={`text-xs font-mono tracking-widest uppercase leading-snug ${
-            featured ? 'text-orange-300' : 'text-gray-400'
+            featured ? 'text-white/65' : 'text-gray-400'
           }`}
         >
           {tag}
         </span>
         {featured && (
-          <span className="shrink-0 text-[10px] font-mono font-semibold uppercase bg-orange-400 text-black px-2 py-1 rounded-full">
+          <span className="shrink-0 text-[10px] font-mono font-semibold uppercase bg-white text-black px-2 py-1 rounded-full">
             Most Popular
           </span>
         )}
@@ -243,7 +228,7 @@ function MobileCard({ tier, onSelect }: { tier: Tier; onSelect: () => void }) {
             key={i}
             className={`text-sm flex items-start gap-2 ${featured ? 'text-gray-300' : 'text-gray-700'}`}
           >
-            <span className={featured ? 'text-orange-400' : 'text-black'}>→</span>
+            <span className={featured ? 'text-white' : 'text-black'}>→</span>
             {f}
           </li>
         ))}
@@ -253,7 +238,7 @@ function MobileCard({ tier, onSelect }: { tier: Tier; onSelect: () => void }) {
         onClick={onSelect}
         className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors ${
           featured
-            ? 'bg-orange-400 text-black hover:bg-orange-300'
+            ? 'bg-white text-black hover:bg-gray-200'
             : 'bg-black text-white hover:bg-gray-800'
         }`}
       >
@@ -276,21 +261,11 @@ export default function PricingSection({
 
   const [hovered, setHovered] = useState<number | null>(null);
 
-  /*
-   * useLayoutEffect runs synchronously before the browser paints.
-   * GSAP.set moves cards to y:-200 immediately, so there is no
-   * single-frame flash of cards at y:0 before the entrance fires.
-   */
   useLayoutEffect(() => {
     const wrappers = containerRef.current?.querySelectorAll<HTMLElement>('.card-wrapper');
     if (wrappers) gsap.set(Array.from(wrappers), { y: -200 });
   }, []);
 
-  /*
-   * IntersectionObserver fires the entrance once the section scrolls into
-   * view. Uses browser-native IO (not GSAP ScrollTrigger) so it is fully
-   * compatible with Lenis smooth-scroll.
-   */
   useEffect(() => {
     const section = sectionRef.current;
     const container = containerRef.current;
@@ -303,19 +278,11 @@ export default function PricingSection({
 
         const wrappers = Array.from(container.querySelectorAll<HTMLElement>('.card-wrapper'));
 
-        /*
-         * Pro (index 1, center) drops first — stagger from:'center' handles
-         * ordering automatically: center → sides at +120ms each.
-         */
         gsap.to(wrappers, {
           y: 0,
           duration: 0.9,
           ease: 'power3.out',
           stagger: { each: 0.12, from: 'center' },
-          /*
-           * After the entrance completes, clear the GSAP inline transform so
-           * Framer Motion can own the element transforms cleanly.
-           */
           onComplete: () => gsap.set(wrappers, { clearProps: 'transform' }),
         });
 
@@ -341,17 +308,27 @@ export default function PricingSection({
   }, []);
 
   return (
-    <section id="services" ref={sectionRef} className="py-20 px-6">
-
+    <section id="services" ref={sectionRef} className="py-10 md:py-12 px-6">
       {/* Section header */}
-      <div className="text-center mb-12">
-        <p className="font-mono text-xs tracking-[0.4em] text-gray-500 mb-4 uppercase">Services</p>
-        <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          Three ways to work together.
+      <motion.div
+        className="text-center mb-10"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-120px' }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <p className="font-mono text-xs tracking-[0.45em] text-gray-500 mb-4 uppercase">
+          Services  ·  03
+        </p>
+        <h2
+          className="font-extrabold tracking-tight"
+          style={{ fontSize: 'clamp(2.5rem, 7vw, 6rem)', letterSpacing: '-0.035em', lineHeight: 0.96 }}
+        >
+          Three ways<br />to work together.
         </h2>
-      </div>
+      </motion.div>
 
-      {/* ── Desktop: flex row, fan transforms, always visible ── */}
+      {/* Desktop: flex row */}
       <div
         ref={containerRef}
         className="hidden md:flex items-center justify-center max-w-5xl mx-auto"
@@ -369,7 +346,7 @@ export default function PricingSection({
         ))}
       </div>
 
-      {/* ── Mobile: horizontal scroll-snap carousel ── */}
+      {/* Mobile: carousel */}
       <div
         ref={carouselRef}
         className="md:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6"
@@ -383,7 +360,6 @@ export default function PricingSection({
           />
         ))}
       </div>
-
     </section>
   );
 }

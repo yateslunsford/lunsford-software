@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Link from 'next/link';
 import {
   motion,
   useScroll,
@@ -14,18 +15,42 @@ import { projects, type Project } from '@/lib/projects';
 /* ─── Cinematic ease for the card hand-offs ─── */
 const EASE = cubicBezier(0.22, 1, 0.36, 1);
 
-/* ─── Visibility windows per project. Overlap by ~0.05 so cards
-       crossfade/swap instead of snapping. ─── */
+/* ─── Visibility windows per project. Each card owns 1/N of the scroll,
+       with ~0.05 overlap so cards crossfade instead of snapping. ─── */
 type Window = { in: [number, number]; out: [number, number] };
-const WINDOWS: Window[] = [
-  { in: [0.0, 0.02], out: [0.35, 0.4] }, // project 0 — already on stage
-  { in: [0.35, 0.4], out: [0.65, 0.7] }, // project 1
-  { in: [0.65, 0.7], out: [1.0, 1.0] },  // project 2 — stays through end
-];
+
+const N_PROJECTS = projects.length;
+const STEP = 1 / N_PROJECTS;
+const OVERLAP = 0.05;
+
+const WINDOWS: Window[] = projects.map((_, i) => {
+  const isLast   = i === N_PROJECTS - 1;
+  const inStart  = i * STEP;
+  const outStart = (i + 1) * STEP;
+  return {
+    in:  [inStart, Math.min(inStart + OVERLAP, 1)] as [number, number],
+    out: isLast
+      ? ([1, 1] as [number, number])
+      : ([outStart, Math.min(outStart + OVERLAP, 1)] as [number, number]),
+  };
+});
+
+/* ─── Stage scales w/ N. Tighter than before so the sticky releases
+       as soon as the last card finishes — no dead space afterward. ─── */
+const STAGE_HEIGHT_VH = Math.max(55 * N_PROJECTS, 165);
+
+/* ─── Evenly-spaced progress points for bg color lerp. ─── */
+const BG_PROGRESS_STOPS =
+  N_PROJECTS === 1
+    ? [0, 1]
+    : projects.map((_, i) => i / (N_PROJECTS - 1));
+const BG_COLORS =
+  N_PROJECTS === 1
+    ? [projects[0].color, projects[0].color]
+    : projects.map((p) => p.color);
 
 const NOISE_SVG = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")`;
 
-/* ─── Build an rgba string from a #rrggbb hex and an alpha. ─── */
 function hexToRgba(hex: string, alpha: number): string {
   const v = hex.replace('#', '');
   const r = parseInt(v.slice(0, 2), 16);
@@ -35,7 +60,8 @@ function hexToRgba(hex: string, alpha: number): string {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   FEATURED WORK — sticky 3-card scroll tour
+   FEATURED WORK — sticky scroll tour, then a hardcoded
+   "See All Work" CTA block before handing off to the next section.
 ═══════════════════════════════════════════════════════════ */
 export default function FeaturedWork() {
   const reduceMotion = useReducedMotion() ?? false;
@@ -46,38 +72,28 @@ export default function FeaturedWork() {
     offset: ['start start', 'end end'],
   });
 
-  // Section background lerps through each project's color across the scroll.
-  const bgColor = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    projects.map((p) => p.color),
-  );
-
-  // "See all work" CTA fades + rises into view during the last project.
-  const ctaOpacity = useTransform(scrollYProgress, [0.82, 0.96], [0, 1]);
-  const ctaY = useTransform(scrollYProgress, [0.82, 0.96], [20, 0]);
+  const bgColor = useTransform(scrollYProgress, BG_PROGRESS_STOPS, BG_COLORS);
 
   return (
-    <section
-      id="work"
-      className="relative"
-      style={{
-        // Solid dark for the section body, fading to the next section's
-        // background (#fafafa from FactsRibbon) in the last 15% of height.
-        background:
-          'linear-gradient(to bottom, #060606 0%, #060606 88%, #fafafa 100%)',
-      }}
-    >
-      {/* ── 180vh driver — sticky inside paints the cards ── */}
-      <div ref={stageRef} className="relative" style={{ height: '180vh' }}>
+    <section id="work" className="relative bg-[#060606]">
+      {/* ── Soft entry — fades the previous light section into the dark stage. ── */}
+      <div
+        aria-hidden="true"
+        className="h-16"
+        style={{
+          background:
+            'linear-gradient(to bottom, #fafafa 0%, #1a1a1a 60%, #060606 100%)',
+        }}
+      />
+
+      {/* ── Driver — sticky inside paints the cards. Height = N * 55vh. ── */}
+      <div ref={stageRef} className="relative" style={{ height: `${STAGE_HEIGHT_VH}vh` }}>
         <motion.div
           className="sticky top-0 h-screen overflow-hidden"
-          style={{ background: bgColor, paddingBottom: '80px' }}
+          style={{ background: bgColor }}
         >
-          {/* Noise grain — same recipe as the hero */}
           <NoiseGrain reduceMotion={reduceMotion} />
 
-          {/* Ghost project titles, one per project, drifting up */}
           {projects.map((p, i) => (
             <GhostTitle
               key={p.slug}
@@ -88,23 +104,19 @@ export default function FeaturedWork() {
             />
           ))}
 
-          {/* Section label — top-left in the gutter */}
+          {/* Section label — top-left */}
           <div className="absolute top-8 left-8 z-10 pointer-events-none">
-            <p className="font-mono text-[11px] tracking-[0.4em] text-white/45 uppercase">
+            <p className="font-mono text-[11px] tracking-[0.45em] text-white/65 uppercase">
               Featured Work
+            </p>
+            <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/35 mt-1">
+              04  ·  Selected Builds
             </p>
           </div>
 
-          {/* Right-edge scroll indicator */}
           <ScrollDots progress={scrollYProgress} />
 
-          {/* Card stage — all three cards stacked, only the active is opaque.
-              paddingBottom mirrors the sticky's so flex centering lifts the
-              card off the bottom edge, leaving room for the CTA + fade. */}
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ paddingBottom: '80px' }}
-          >
+          <div className="absolute inset-0 flex items-center justify-center">
             {projects.map((p, i) => (
               <ProjectCard
                 key={p.slug}
@@ -117,69 +129,61 @@ export default function FeaturedWork() {
               />
             ))}
           </div>
-
-          {/* ── Bottom fade overlay — masks any card overflow + softens the
-                seam between the card stage and the CTA button ── */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: '140px',
-              background:
-                'linear-gradient(to bottom, rgba(6,6,6,0) 0%, rgba(6,6,6,0.4) 40%, rgba(6,6,6,0.95) 100%)',
-              pointerEvents: 'none',
-              zIndex: 15,
-            }}
-            aria-hidden="true"
-          />
-
-          {/* ── "See all work" CTA pinned at the bottom of the sticky
-                stage, fading + rising in during the last project ── */}
-          <motion.div
-            style={{
-              position: 'absolute',
-              bottom: '12vh',
-              left: 0,
-              right: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              zIndex: 20,
-              opacity: ctaOpacity,
-              y: ctaY,
-            }}
-          >
-            <a
-              href="/work"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '14px 36px',
-                borderRadius: '999px',
-                border: '1px solid rgba(255,255,255,0.15)',
-                color: 'white',
-                fontFamily: 'var(--font-geist-mono, monospace)',
-                fontSize: '0.8rem',
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                textDecoration: 'none',
-                background: 'rgba(255,255,255,0.05)',
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              See all work{' '}
-              <span style={{ color: 'rgba(255,140,60,0.9)' }}>→</span>
-            </a>
-          </motion.div>
         </motion.div>
       </div>
 
-      {/* ── Trailing bridge — empty space lets the section's gradient
-            background fade into the next section's #fafafa floor ── */}
-      <div style={{ height: '25vh' }} aria-hidden="true" />
+      {/* ── Hardcoded "See All Work" block — always visible after the
+            sticky stage. This is the last thing before the next section. ── */}
+      <SeeAllWorkBlock />
     </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SEE ALL WORK — full-width button block, hardcoded, always
+   rendered. Dark background to bridge the cards into the
+   light section that follows.
+═══════════════════════════════════════════════════════════ */
+function SeeAllWorkBlock() {
+  return (
+    <div
+      className="relative px-6 pt-14 pb-28"
+      style={{
+        background:
+          'linear-gradient(to bottom, #060606 0%, #060606 78%, #fafafa 100%)',
+      }}
+    >
+      <div className="max-w-3xl mx-auto flex flex-col items-center gap-6">
+        <p className="font-mono text-[10px] tracking-[0.45em] text-white/40 uppercase">
+          {projects.length} featured  ·  more inside
+        </p>
+        <Link
+          href="/work"
+          className="see-all-btn block w-full text-center no-underline"
+          style={{
+            border: '1px solid #ffffff',
+            background: 'transparent',
+            color: '#ffffff',
+            padding: '20px 40px',
+            fontSize: '13px',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            fontFamily: 'var(--font-geist-mono), monospace',
+            transition: 'background-color 0.2s ease, color 0.2s ease',
+            cursor: 'pointer',
+          }}
+        >
+          See All Work →
+        </Link>
+      </div>
+
+      <style>{`
+        .see-all-btn:hover {
+          background-color: #ffffff !important;
+          color: #000000 !important;
+        }
+      `}</style>
+    </div>
   );
 }
 
@@ -201,8 +205,6 @@ function ProjectCard({
   isFirst: boolean;
   isLast: boolean;
 }) {
-  // Build per-project input/output keyframes. First card has no entry slide,
-  // last card has no exit slide — they're already / still on stage.
   const inputRange: number[] = isFirst
     ? [w.in[1], w.out[0], w.out[1]]
     : isLast
@@ -221,52 +223,65 @@ function ProjectCard({
       ? [0, 1, 1]
       : [0, 1, 1, 0];
 
-  const xVw = useTransform(progress, inputRange, xRange, { ease: EASE });
-  const x = useTransform(xVw, (v) => `${v}vw`);
+  const scaleRange: number[] = isFirst
+    ? reduceMotion ? [1, 1, 1] : [1, 1, 0.94]
+    : isLast
+      ? reduceMotion ? [1, 1, 1] : [0.94, 1, 1]
+      : reduceMotion ? [1, 1, 1, 1] : [0.94, 1, 1, 0.94];
+
+  const xVw    = useTransform(progress, inputRange, xRange, { ease: EASE });
+  const x      = useTransform(xVw, (v) => `${v}vw`);
   const opacity = useTransform(progress, inputRange, opacityRange);
+  const scale   = useTransform(progress, inputRange, scaleRange);
 
   const isExternal = project.url.startsWith('http');
 
   return (
     <motion.div
-      className="absolute"
+      className="absolute group"
       style={{
         x,
         opacity,
-        width: '70vw',
-        height: 'clamp(380px, 55vh, 480px)',
-        marginBottom: '100px',
+        scale,
+        width: 'min(74vw, 1100px)',
+        height: 'clamp(380px, 56vh, 500px)',
         background: project.color,
         borderRadius: '20px',
-        border: `1px solid ${hexToRgba(project.accentColor, 0.15)}`,
+        border: `1.5px solid ${hexToRgba(project.accentColor, 0.32)}`,
         boxShadow:
-          '0 40px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04)',
+          '0 50px 120px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,255,255,0.06)',
         overflow: 'hidden',
         willChange: 'transform, opacity',
       }}
+      whileHover={
+        reduceMotion ? undefined : { scale: 1.02, transition: { duration: 0.4, ease: EASE } }
+      }
     >
-      {/* Card-local noise */}
+      <div
+        className="absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ border: `1.5px solid ${project.accentColor}` }}
+        aria-hidden="true"
+      />
+
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: NOISE_SVG,
           mixBlendMode: 'overlay',
-          opacity: 0.06,
+          opacity: 0.07,
         }}
         aria-hidden="true"
       />
 
-      {/* Accent corner glow */}
       <div
-        className="absolute -top-32 -right-32 w-96 h-96 pointer-events-none rounded-full"
+        className="absolute -top-32 -right-32 w-96 h-96 pointer-events-none rounded-full transition-opacity duration-500 opacity-60 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(circle, ${project.accentColor}22, transparent 70%)`,
+          background: `radial-gradient(circle, ${hexToRgba(project.accentColor, 0.24)}, transparent 70%)`,
         }}
         aria-hidden="true"
       />
 
       <div className="relative h-full p-8 md:p-12 flex flex-col justify-between">
-        {/* Top row */}
         <div className="flex items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
             <h3
@@ -289,14 +304,13 @@ function ProjectCard({
           </div>
 
           <div className="flex flex-col items-end gap-3 flex-shrink-0">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-white/45">
+            <span className="font-mono text-[10px] tracking-[0.3em] text-white/55">
               {project.year}
             </span>
             <StatusBadge status={project.status} />
           </div>
         </div>
 
-        {/* Middle: tags, right-aligned */}
         <div
           className="flex flex-wrap justify-end max-w-[60%] ml-auto"
           style={{ gap: 8 }}
@@ -304,10 +318,10 @@ function ProjectCard({
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="font-mono text-[10px] tracking-widest uppercase rounded-full text-white/70"
+              className="font-mono text-[10px] tracking-widest uppercase rounded-full text-white/85"
               style={{
-                border: '1px solid rgba(255,255,255,0.12)',
-                padding: '4px 10px',
+                border: '1px solid rgba(255,255,255,0.22)',
+                padding: '5px 11px',
               }}
             >
               {tag}
@@ -315,12 +329,10 @@ function ProjectCard({
           ))}
         </div>
 
-        {/* Bottom row */}
         <div className="flex items-end justify-between gap-6">
           <p
-            className="text-sm md:text-base max-w-xl leading-relaxed"
+            className="text-sm md:text-base max-w-xl leading-relaxed text-white/75"
             style={{
-              color: 'rgba(255, 255, 255, 0.6)',
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
@@ -344,7 +356,7 @@ function ProjectCard({
               href={project.url}
               target={isExternal ? '_blank' : undefined}
               rel={isExternal ? 'noopener noreferrer' : undefined}
-              className="font-mono text-xs tracking-widest uppercase whitespace-nowrap text-white/90 hover:text-white transition-colors inline-flex items-center gap-2 group"
+              className="font-mono text-xs tracking-[0.18em] uppercase whitespace-nowrap text-white hover:text-white transition-colors inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/30 hover:border-white/70"
             >
               View Project
               <span
@@ -361,15 +373,12 @@ function ProjectCard({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   STATUS BADGE
-═══════════════════════════════════════════════════════════ */
 function StatusBadge({ status }: { status: Project['status'] }) {
   if (status === 'live') {
     return (
-      <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/80">
-        <span className="relative w-1.5 h-1.5 rounded-full bg-green-400">
-          <span className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-70" />
+      <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/90">
+        <span className="relative w-1.5 h-1.5 rounded-full bg-white">
+          <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-70" />
         </span>
         Live
       </span>
@@ -378,7 +387,7 @@ function StatusBadge({ status }: { status: Project['status'] }) {
   if (status === 'in-progress') {
     return (
       <span className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/80">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+        <span className="w-1.5 h-1.5 rounded-full bg-white/70" />
         Building
       </span>
     );
@@ -391,9 +400,6 @@ function StatusBadge({ status }: { status: Project['status'] }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   GHOST TITLE — huge translucent project name drifting up
-═══════════════════════════════════════════════════════════ */
 function GhostTitle({
   project,
   w,
@@ -413,7 +419,7 @@ function GhostTitle({
   const y = useTransform(
     progress,
     [w.in[0], w.out[1]],
-    reduceMotion ? [0, 0] : [60, -120],
+    reduceMotion ? [0, 0] : [50, -90],
   );
 
   return (
@@ -423,16 +429,16 @@ function GhostTitle({
       aria-hidden="true"
     >
       <p
-        className="leading-none select-none whitespace-nowrap"
+        className="leading-none select-none text-center"
         style={{
-          fontSize: 'clamp(6rem, 15vw, 18rem)',
-          opacity: 0.07,
+          fontSize: 'clamp(4rem, 11vw, 12rem)',
+          opacity: 0.085,
           color: project.accentColor,
           fontFamily:
             'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.025em',
           fontWeight: 400,
-          transform: 'translateX(-6%)',
+          maxWidth: '94vw',
         }}
       >
         {project.title.toUpperCase()}
@@ -441,15 +447,11 @@ function GhostTitle({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   SCROLL DOTS — right-edge progress indicator
-═══════════════════════════════════════════════════════════ */
 function ScrollDots({ progress }: { progress: MotionValue<number> }) {
   return (
     <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-4">
-      {/* Connecting line behind the dots */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 w-px bg-white/15"
+        className="absolute left-1/2 -translate-x-1/2 w-px bg-white/20"
         style={{ top: 4, bottom: 4 }}
         aria-hidden="true"
       />
@@ -472,19 +474,19 @@ function ScrollDot({
   const fillOpacity = useTransform(
     progress,
     [w.in[0], w.in[1], w.out[0], w.out[1]],
-    [0.15, 1, 1, 0.25],
+    [0.2, 1, 1, 0.3],
   );
   const scale = useTransform(
     progress,
     [w.in[0], w.in[1], w.out[0], w.out[1]],
-    [0.85, 1.15, 1.15, 0.85],
+    [0.85, 1.2, 1.2, 0.85],
   );
 
   return (
     <motion.div
       className="relative w-2 h-2 rounded-full"
       style={{
-        border: '1px solid rgba(255,255,255,0.35)',
+        border: '1px solid rgba(255,255,255,0.5)',
         scale,
       }}
     >
@@ -496,9 +498,6 @@ function ScrollDot({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
-   NOISE GRAIN — shared with the hero's atmospheric layer
-═══════════════════════════════════════════════════════════ */
 function NoiseGrain({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <motion.div

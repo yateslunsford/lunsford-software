@@ -23,36 +23,27 @@ import MagneticCTA from '@/components/MagneticCTA';
 
 /* ═══════════════════════════════════════════════════════════════════════
    ACT TIMING — every number is a scrollYProgress checkpoint (0 → 1).
-   Read these like a stage cue sheet. Anything that animates on scroll
-   pulls from this table so the three acts stay in lock-step.
    ═══════════════════════════════════════════════════════════════════════ */
 
 const T = {
-  // Act I — Arrival (drop already happened on mount; this is the headline)
   headlineAStart: 0.0,
   headlineAEnd: 0.28,
   headlineAFadeOut: [0.32, 0.42] as [number, number],
 
-  // Act II — Card Tour
   rotateInStart: 0.30,
   rotateMid: 0.45,
   rotateLand: 0.60,
   headlineBIn: [0.42, 0.54] as [number, number],
   headlineBOut: [0.66, 0.75] as [number, number],
 
-  // Act III — Fly-through + CTA
   flyStart: 0.72,
   flyPeak: 1.0,
   ctaIn: [0.84, 0.94] as [number, number],
 } as const;
 
-const HEADLINE_A = 'WE BUILD WEBSITES THAT CLOSE.';
-const HEADLINE_B = 'BUILT IN GA. SHIPPED EVERYWHERE.';
-const TAGLINE   = "Custom websites that don't look like everyone else's.";
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Scramble hook — used on the Act III tagline.
-   ═══════════════════════════════════════════════════════════════════════ */
+const HEADLINE_A = 'CRAFT OVER EVERYTHING.';
+const HEADLINE_B = 'BUILT IN GA. SHIPS EVERYWHERE.';
+const TAGLINE    = "Custom websites that don't look like everyone else's.";
 
 const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·—!@#';
 
@@ -92,11 +83,6 @@ function useScramble(target: string, active: boolean): string {
   return text;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   ScrollLetter — one letter that fades + lifts into place as scroll
-   crosses its assigned slice. Many of these compose a slamming headline.
-   ═══════════════════════════════════════════════════════════════════════ */
-
 function ScrollLetter({
   char,
   range,
@@ -121,16 +107,10 @@ function ScrollLetter({
         whiteSpace: 'pre',
       }}
     >
-      {char === ' ' ? ' ' : char}
+      {char === ' ' ? ' ' : char}
     </motion.span>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   EditorialHeadline — the giant Anton headline behind the card. Each
-   character gets its own ScrollLetter; the whole block then fades out as
-   a unit when the next act takes over.
-   ═══════════════════════════════════════════════════════════════════════ */
 
 function EditorialHeadline({
   text,
@@ -152,8 +132,6 @@ function EditorialHeadline({
     const [start, end] = inRange;
     const total = end - start;
     return text.split('').map((char, i) => {
-      // Each letter reveals over a small window; windows overlap heavily
-      // so the headline reads as a wave, not a typewriter.
       const letterStart = start + (i / len) * (total * 0.7);
       const letterEnd   = letterStart + total * 0.18;
       return { char, range: [letterStart, Math.min(letterEnd, end)] as [number, number] };
@@ -175,13 +153,6 @@ function EditorialHeadline({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   BusinessCard — drops in on mount, then hands its transform over to
-   scroll. Outer wrapper owns the drop entrance; inner wrapper owns the
-   scroll-driven scale / rotateX / Y; innermost wrapper owns rotateY
-   (the face flip).
-   ═══════════════════════════════════════════════════════════════════════ */
-
 function BusinessCard({
   scrollYProgress,
   reduceMotion,
@@ -189,7 +160,6 @@ function BusinessCard({
   scrollYProgress: MotionValue<number>;
   reduceMotion: boolean;
 }) {
-  // Scroll-driven transforms — every one keyframed across three acts.
   const cardY = useTransform(
     scrollYProgress,
     [0, T.rotateInStart, 0.65, T.flyPeak],
@@ -211,7 +181,6 @@ function BusinessCard({
     reduceMotion ? [0, 0, 0, 0, 0] : [0, 0, 180, 360, 360],
   );
 
-  // Smooth out the scroll feed so face flips feel like physics, not steps.
   const smoothRotateY = useSpring(cardRotateY, { stiffness: 160, damping: 14 });
   const smoothRotateX = useSpring(cardRotateX, { stiffness: 160, damping: 14 });
 
@@ -225,7 +194,6 @@ function BusinessCard({
 
   return (
     <motion.div
-      // Drop entrance — one-shot on mount. Spring with bounce.
       initial={reduceMotion ? false : { y: '-120vh', rotate: 14, opacity: 0 }}
       animate={reduceMotion ? undefined : { y: 0, rotate: 0, opacity: 1 }}
       transition={
@@ -243,8 +211,6 @@ function BusinessCard({
         willChange: 'transform',
       }}
     >
-      {/* Dedicated perspective parent — no competing transforms here.
-          This is the *direct* parent of the rotateY element. */}
       <div
         style={{
           perspective: 1400,
@@ -255,10 +221,6 @@ function BusinessCard({
         }}
       >
         <motion.div
-          // The card itself — owns every transform that needs the
-          // perspective context (scale, rotateX, rotateY, Y) and carries
-          // transformStyle as a direct motion style prop so Framer
-          // Motion processes it before composing the transform string.
           style={{
             y: cardY,
             scale: cardScale,
@@ -380,7 +342,7 @@ function BusinessCard({
             <div style={{
               width: '32px',
               height: '1px',
-              background: 'rgba(255,140,60,0.6)',
+              background: 'rgba(255,255,255,0.55)',
               marginTop: '4px',
             }} />
           </div>
@@ -391,10 +353,6 @@ function BusinessCard({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   CardHero — three-act cinematic. 250vh container, sticky stage.
-   ═══════════════════════════════════════════════════════════════════════ */
-
 export default function CardHero() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion() ?? false;
@@ -404,7 +362,7 @@ export default function CardHero() {
     offset: ['start start', 'end end'],
   });
 
-  /* ─── Cursor-following glow (existing, preserved) ─── */
+  /* ─── Cursor-following glow ─── */
   const rawX = useMotionValue(0.5);
   const rawY = useMotionValue(0.4);
   const springX = useSpring(rawX, { stiffness: 55, damping: 22 });
@@ -412,13 +370,12 @@ export default function CardHero() {
   const pctX = useTransform(springX, [0, 1], ['0%', '100%']);
   const pctY = useTransform(springY, [0, 1], ['0%', '100%']);
 
-  // Cursor glow intensity pulses with the acts.
   const cursorIntensity = useTransform(
     scrollYProgress,
     [0, 0.15, 0.4, 0.7, 1],
-    reduceMotion ? [0.18, 0.18, 0.18, 0.18, 0.18] : [0.22, 0.30, 0.14, 0.18, 0.32],
+    reduceMotion ? [0.10, 0.10, 0.10, 0.10, 0.10] : [0.12, 0.18, 0.08, 0.10, 0.18],
   );
-  const cursorGlow = useMotionTemplate`radial-gradient(circle at ${pctX} ${pctY}, rgba(255,140,60,${cursorIntensity}), transparent 38%)`;
+  const cursorGlow = useMotionTemplate`radial-gradient(circle at ${pctX} ${pctY}, rgba(255,255,255,${cursorIntensity}), transparent 38%)`;
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -430,35 +387,29 @@ export default function CardHero() {
     [rawX, rawY],
   );
 
-  /* ─── Orange ambient glow — pulses bright on card-drop impact ─── */
-  const [impacted, setImpacted] = useState(false);
+  /* ─── White ambient glow ─── */
+  const [impacted, setImpacted] = useState(() => reduceMotion ?? false);
   useEffect(() => {
-    if (reduceMotion) {
-      setImpacted(true);
-      return;
-    }
-    // ~spring settle time. Pulse fires when the card hits center.
+    if (reduceMotion) return;
     const id = window.setTimeout(() => setImpacted(true), 950);
     return () => window.clearTimeout(id);
   }, [reduceMotion]);
 
-  // Atmospheric orange — dims through Act II so eye relaxes, returns
-  // for Act III as the CTA arrives.
-  const orangeOpacity = useTransform(
+  const whiteOpacity = useTransform(
     scrollYProgress,
     [0, 0.15, 0.45, 0.75, 1],
     reduceMotion ? [1, 1, 1, 1, 1] : [1, 0.85, 0.45, 0.8, 1.1],
   );
-  const orangeScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1, 1.4]);
+  const whiteScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1, 1.4]);
 
-  /* ─── Cool counter-glow (icy blue, low intensity) ─── */
+  /* ─── Cool counter-glow ─── */
   const blueOpacity = useTransform(
     scrollYProgress,
     [0, 0.35, 0.7, 1],
     reduceMotion ? [0.5, 0.5, 0.5, 0.5] : [0.35, 0.8, 0.55, 0.15],
   );
 
-  /* ─── Ghost "BUILT RIGHT" — now scales and drifts dramatically ─── */
+  /* ─── Ghost "BUILT RIGHT" ─── */
   const ghostY      = useTransform(scrollYProgress, [0, 0.9], reduceMotion ? [0, 0] : [0, -120]);
   const ghostScale  = useTransform(scrollYProgress, [0, 0.85], reduceMotion ? [1, 1] : [0.95, 1.6]);
   const ghostOpacity = useTransform(
@@ -479,7 +430,7 @@ export default function CardHero() {
     if (v > 0.08 && !scrambleActive) setScrambleActive(true);
   });
 
-  /* ─── Scroll hint (tiny) ─── */
+  /* ─── Scroll hint ─── */
   const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.04], [1, 0]);
 
   return (
@@ -498,7 +449,7 @@ export default function CardHero() {
         style={{ contain: 'paint' }}
       >
 
-        {/* ── Cool counter-glow (icy white, upper-left) ── */}
+        {/* Cool counter-glow */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -509,14 +460,14 @@ export default function CardHero() {
           aria-hidden="true"
         />
 
-        {/* ── Orange ambient glow (center-low, pulses on impact) ── */}
+        {/* White ambient glow */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse 70% 55% at 50% 55%, rgba(255,140,60,0.22), transparent 58%)',
-            opacity: orangeOpacity,
-            scale: orangeScale,
+              'radial-gradient(ellipse 70% 55% at 50% 55%, rgba(255,255,255,0.12), transparent 58%)',
+            opacity: whiteOpacity,
+            scale: whiteScale,
             transformOrigin: '50% 55%',
           }}
           aria-hidden="true"
@@ -534,14 +485,14 @@ export default function CardHero() {
           }
         />
 
-        {/* ── Cursor-following reactive glow ── */}
+        {/* Cursor glow */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           style={{ backgroundImage: cursorGlow }}
           aria-hidden="true"
         />
 
-        {/* ── Film vignette ── */}
+        {/* Film vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -551,7 +502,7 @@ export default function CardHero() {
           aria-hidden="true"
         />
 
-        {/* ── Noise grain (animated flicker) ── */}
+        {/* Noise grain */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -566,7 +517,7 @@ export default function CardHero() {
           aria-hidden="true"
         />
 
-        {/* ── Ghost "BUILT RIGHT" — scales up across the scroll ── */}
+        {/* Ghost "BUILT RIGHT" */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
           style={{ y: ghostY, scale: ghostScale, opacity: ghostOpacity }}
@@ -585,7 +536,7 @@ export default function CardHero() {
           </p>
         </motion.div>
 
-        {/* ── Act I headline — slams in letter-by-letter ── */}
+        {/* Act I headline */}
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none px-6"
           style={{ zIndex: 2 }}
@@ -606,7 +557,7 @@ export default function CardHero() {
           />
         </div>
 
-        {/* ── Act II sub-statement — swaps in, mono, tracked out ── */}
+        {/* Act II sub-statement */}
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none px-6"
           style={{ zIndex: 2 }}
@@ -628,10 +579,10 @@ export default function CardHero() {
           />
         </div>
 
-        {/* ── The card itself ── */}
+        {/* The card itself */}
         <BusinessCard scrollYProgress={scrollYProgress} reduceMotion={reduceMotion} />
 
-        {/* ── Act III CTA — rises from where the card was ── */}
+        {/* Act III CTA */}
         <motion.div
           className="absolute inset-x-0 z-20"
           style={{
@@ -651,7 +602,7 @@ export default function CardHero() {
           </div>
         </motion.div>
 
-        {/* ── Faint scroll hint (just a tick mark, no "scroll down ↓") ── */}
+        {/* Scroll hint */}
         <motion.div
           className="absolute bottom-4 inset-x-0 text-center pointer-events-none"
           style={{ opacity: scrollHintOpacity }}

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Anton } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
+import PageLoader from "@/components/PageLoader";
+import ScrollProgress from "@/components/ScrollProgress";
+import CursorGlow from "@/components/CursorGlow";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +24,8 @@ const anton = Anton({
 
 export const metadata: Metadata = {
   title: "Lunsford Software Development",
-  description: "Custom websites and web applications. Built fast, built right. Based in Newnan, GA.",
+  description:
+    "Custom websites and web applications. Built fast, built right. Based in Newnan, GA.",
 };
 
 export default function RootLayout({
@@ -31,8 +35,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} antialiased`}>
-        <SmoothScroll>{children}</SmoothScroll>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} antialiased`}
+      >
+        <SmoothScroll>
+          <PageLoader />
+          <ScrollProgress />
+          <CursorGlow />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );
