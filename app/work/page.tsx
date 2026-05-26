@@ -19,7 +19,7 @@ const NOISE_SVG = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/20
 ═══════════════════════════════════════════════════════════ */
 export default function WorkPage() {
   return (
-    <main className="bg-[#060606] text-white min-h-screen">
+    <main className="bg-[#060606] text-white">
       <WorkNav />
       <WorkHeader />
       <ProjectGrid />
@@ -35,16 +35,16 @@ export default function WorkPage() {
 function WorkNav() {
   return (
     <nav className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[#060606]/70 border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
         <Link
           href="/#work"
-          className="font-mono text-xs tracking-widest uppercase text-white/45 hover:text-white transition-colors"
+          className="font-mono text-[10px] sm:text-xs tracking-widest uppercase text-white/45 hover:text-white transition-colors whitespace-nowrap"
         >
           ← Back
         </Link>
         <Link
           href="/#contact"
-          className="text-sm bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200 transition-colors font-semibold"
+          className="text-xs sm:text-sm bg-white text-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-full hover:bg-gray-200 transition-colors font-semibold whitespace-nowrap"
         >
           Start a project
         </Link>
@@ -110,13 +110,13 @@ function WorkHeader() {
 
       {/* Centered headline */}
       <motion.div
-        className="relative z-10 text-center px-6"
+        className="relative z-10 text-center px-4 sm:px-6"
         style={{ y, opacity }}
       >
         <motion.h1
           className="text-white leading-[0.85] select-none"
           style={{
-            fontSize: 'clamp(5rem, 16vw, 18rem)',
+            fontSize: 'clamp(3.5rem, 16vw, 18rem)',
             fontFamily:
               'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
             fontWeight: 400,
@@ -134,7 +134,7 @@ function WorkHeader() {
           ALL WORK
         </motion.h1>
         <motion.p
-          className="font-mono text-xs md:text-sm tracking-[0.45em] uppercase text-white/45 mt-8"
+          className="font-mono text-[10px] sm:text-xs md:text-sm tracking-[0.3em] sm:tracking-[0.45em] uppercase text-white/45 mt-6 sm:mt-8"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={reduceMotion ? undefined : { opacity: 1 }}
           transition={
@@ -163,9 +163,9 @@ function WorkHeader() {
 ═══════════════════════════════════════════════════════════ */
 function ProjectGrid() {
   return (
-    <section className="relative px-6 py-12 md:py-16">
+    <section className="relative px-4 sm:px-6 pt-6 pb-8 sm:pt-8 sm:pb-10">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-8">
           {projects.map((p, i) => {
             const fullWidth = i % 3 === 0;
             return (
@@ -230,14 +230,14 @@ function WorkCard({
               transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
             }
       }
-      className={`group relative overflow-hidden rounded-3xl ${
+      className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl ${
         fullWidth ? 'md:col-span-2' : ''
       }`}
       style={{
-        height: fullWidth ? 500 : 340,
         background: project.color,
         border: '1px solid rgba(255,255,255,0.10)',
         boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
+        height: 'clamp(340px, 50vw, ' + (fullWidth ? '500px' : '340px') + ')',
       }}
     >
       {/* Accent border that fades in on hover */}
@@ -269,18 +269,18 @@ function WorkCard({
 
       <div
         className={`relative h-full flex flex-col justify-between ${
-          fullWidth ? 'p-8 md:p-12' : 'p-6 md:p-10'
+          fullWidth ? 'p-5 sm:p-8 md:p-12' : 'p-5 sm:p-6 md:p-10'
         }`}
       >
         {/* Top row */}
-        <div className="flex items-start justify-between gap-6">
+        <div className="flex items-start justify-between gap-3 sm:gap-6">
           <div className="flex-1 min-w-0">
             <h3
               className="text-white leading-none"
               style={{
                 fontSize: fullWidth
-                  ? 'clamp(2.5rem, 6vw, 6rem)'
-                  : 'clamp(1.75rem, 3.5vw, 3.25rem)',
+                  ? 'clamp(1.85rem, 6vw, 6rem)'
+                  : 'clamp(1.5rem, 3.5vw, 3.25rem)',
                 letterSpacing: '-0.035em',
                 fontFamily:
                   'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
@@ -290,15 +290,15 @@ function WorkCard({
               {project.title}
             </h3>
             <p
-              className="font-mono text-xs md:text-sm mt-3 tracking-wide"
+              className="font-mono text-[10px] sm:text-xs md:text-sm mt-2 sm:mt-3 tracking-wide"
               style={{ color: project.accentColor }}
             >
               {project.client}
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-3 flex-shrink-0">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-white/45">
+          <div className="flex flex-col items-end gap-2 sm:gap-3 flex-shrink-0">
+            <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.25em] sm:tracking-[0.3em] text-white/45">
               {project.year}
             </span>
             <StatusBadge status={project.status} />
@@ -307,14 +307,14 @@ function WorkCard({
 
         {/* Middle: tags */}
         <div
-          className={`flex flex-wrap gap-2 ${
-            fullWidth ? 'justify-end max-w-[60%] ml-auto' : ''
+          className={`flex flex-wrap gap-1.5 sm:gap-2 ${
+            fullWidth ? 'sm:justify-end sm:max-w-[60%] sm:ml-auto' : ''
           }`}
         >
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="font-mono text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full text-white/75"
+              className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-white/75"
               style={{ border: '1px solid rgba(255,255,255,0.14)' }}
             >
               {tag}
@@ -323,10 +323,10 @@ function WorkCard({
         </div>
 
         {/* Bottom row */}
-        <div className="flex items-end justify-between gap-6">
+        <div className="flex items-end justify-between gap-3 sm:gap-6">
           <p
             className={`text-white/60 leading-relaxed ${
-              fullWidth ? 'text-sm md:text-base max-w-xl' : 'text-xs md:text-sm max-w-md'
+              fullWidth ? 'text-xs sm:text-sm md:text-base max-w-xl' : 'text-xs md:text-sm max-w-md'
             }`}
           >
             {project.description}
@@ -334,7 +334,7 @@ function WorkCard({
           <div className="relative flex-shrink-0 overflow-hidden h-6">
             {project.status === 'in-progress' ? (
               <span
-                className="font-mono text-[10px] tracking-[0.25em] uppercase px-4 py-2 rounded-full whitespace-nowrap"
+                className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] uppercase px-3 sm:px-4 py-1.5 sm:py-2 rounded-full whitespace-nowrap"
                 style={{
                   border: `1px solid ${project.accentColor}`,
                   color: project.accentColor,
@@ -426,7 +426,7 @@ function StartCTA() {
   return (
     <section
       ref={ref}
-      className="relative bg-[#060606] py-20 md:py-28 px-6 overflow-hidden"
+      className="relative bg-[#060606] py-10 sm:py-12 px-4 sm:px-6 overflow-hidden"
     >
       {/* Cool white atmospheric glow — no orange */}
       <div
@@ -439,7 +439,7 @@ function StartCTA() {
       />
       <NoiseGrain reduceMotion={reduceMotion} />
 
-      <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center gap-8">
+      <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center gap-5 sm:gap-7">
         <motion.p
           className="font-mono text-xs tracking-[0.45em] text-white/40 uppercase"
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
@@ -457,7 +457,7 @@ function StartCTA() {
         <motion.h2
           className="text-white leading-[0.95] select-none"
           style={{
-            fontSize: 'clamp(3rem, 10vw, 9rem)',
+            fontSize: 'clamp(2.4rem, 10vw, 9rem)',
             fontFamily:
               'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
             fontWeight: 400,
@@ -524,10 +524,10 @@ function StartCTA() {
 ═══════════════════════════════════════════════════════════ */
 function BackToTop() {
   return (
-    <div className="text-center py-10 border-t border-white/5">
+    <div className="text-center py-6 sm:py-8 border-t border-white/5">
       <Link
         href="#"
-        className="font-mono text-xs tracking-widest uppercase text-white/30 hover:text-white/75 transition-colors"
+        className="font-mono text-[10px] sm:text-xs tracking-widest uppercase text-white/30 hover:text-white/75 transition-colors"
       >
         ↑ lunsfordsoftware.com
       </Link>

@@ -121,20 +121,20 @@ export default function LookCloser() {
 
       {/* ── Top-left section label ── */}
       <motion.div
-        className="absolute top-8 left-8 z-10 pointer-events-none"
+        className="absolute top-20 sm:top-8 left-4 sm:left-8 z-10 pointer-events-none"
         style={{ opacity: labelOpacity }}
       >
-        <p className="font-mono text-[11px] tracking-[0.45em] uppercase text-white/65">
+        <p className="font-mono text-[10px] sm:text-[11px] tracking-[0.35em] sm:tracking-[0.45em] uppercase text-white/65">
           Look Closer
         </p>
-        <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/35 mt-1">
+        <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-white/35 mt-1">
           01  ·  The Craft
         </p>
       </motion.div>
 
-      {/* ── Drag hint ── */}
+      {/* ── Drag hint — hidden on mobile (no mouse) ── */}
       <motion.div
-        className="absolute top-8 right-8 z-10 pointer-events-none"
+        className="hidden sm:block absolute top-8 right-8 z-10 pointer-events-none"
         style={{ opacity: dragHintOpacity }}
         aria-hidden="true"
       >
@@ -202,8 +202,8 @@ function Statement({
 
   return (
     <motion.div
-      className="absolute inset-0 z-10 flex items-end justify-center pointer-events-none px-6"
-      style={{ opacity, y, filter, scale, paddingBottom: '13vh' }}
+      className="absolute inset-0 z-10 flex items-end justify-center pointer-events-none px-4 sm:px-6"
+      style={{ opacity, y, filter, scale, paddingBottom: '12vh' }}
       aria-hidden="true"
     >
       <p
@@ -211,11 +211,12 @@ function Statement({
         style={{
           fontFamily: 'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
           fontWeight: 400,
-          fontSize: 'clamp(2.6rem, 8.5vw, 8.4rem)',
+          fontSize: 'clamp(2rem, 8.5vw, 8.4rem)',
           letterSpacing: '-0.03em',
           lineHeight: 0.95,
           textShadow:
             '0 4px 40px rgba(0,0,0,0.85), 0 0 80px rgba(255,255,255,0.08)',
+          maxWidth: '94vw',
         }}
       >
         {text}

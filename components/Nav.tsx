@@ -9,6 +9,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'framer-motion';
+import Button from '@/components/ui/Button';
 
 /* ═══════════════════════════════════════════════════════════
    Nav — scroll-aware. Transparent + white text over the dark
@@ -45,10 +46,10 @@ export default function Nav() {
         borderColor: borderCol,
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
         <a
           href="#"
-          className="font-mono text-sm tracking-tight font-semibold transition-colors"
+          className="font-mono text-xs sm:text-sm tracking-tight font-semibold transition-colors whitespace-nowrap"
           style={{
             color: scrolled ? '#0a0a0a' : '#ffffff',
             textShadow: scrolled ? 'none' : '0 1px 14px rgba(0,0,0,0.45)',
@@ -72,27 +73,7 @@ export default function Nav() {
           <NavLink href="#about"    scrolled={scrolled}>About</NavLink>
         </div>
 
-        <a
-          href="#contact"
-          className="group relative text-sm px-4 py-2 rounded-full font-semibold overflow-hidden transition-transform duration-300 hover:scale-[1.045]"
-          style={{
-            color:      scrolled ? '#ffffff' : '#0a0a0a',
-            background: scrolled ? '#0a0a0a' : '#ffffff',
-            boxShadow:  scrolled
-              ? '0 2px 14px rgba(0,0,0,0.18)'
-              : '0 2px 18px rgba(255,255,255,0.22)',
-          }}
-        >
-          <span className="relative z-10">Start a project</span>
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            style={{
-              background:
-                'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%)',
-            }}
-          />
-        </a>
+        <Button href="#contact">Start a project</Button>
       </div>
     </motion.nav>
   );

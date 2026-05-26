@@ -145,9 +145,9 @@ function StatsBlock() {
   }, [reduceMotion]);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12 md:py-16">
       <motion.p
-        className="font-mono text-[11px] tracking-[0.5em] text-gray-500 uppercase text-center mb-12"
+        className="font-mono text-[10px] sm:text-[11px] tracking-[0.35em] sm:tracking-[0.5em] text-gray-500 uppercase text-center mb-8 sm:mb-12"
         initial={reduceMotion ? false : { opacity: 0, y: 14 }}
         whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-80px' }}
@@ -158,7 +158,7 @@ function StatsBlock() {
 
       <div
         ref={gridRef}
-        className="grid grid-cols-2 md:grid-cols-4 gap-y-10"
+        className="grid grid-cols-2 md:grid-cols-4 gap-y-8 sm:gap-y-10"
         style={{ columnGap: 0 }}
       >
         {STATS.map((stat, i) => (
@@ -218,7 +218,7 @@ function StatItem({
   return (
     <div
       ref={ref}
-      className={`flex flex-col items-center justify-center text-center px-4 md:px-8 ${mobileBorder} ${desktopBorder}`}
+      className={`flex flex-col items-center justify-center text-center px-2 sm:px-4 md:px-8 ${mobileBorder} ${desktopBorder}`}
     >
       <div
         className="leading-none text-black tabular-nums whitespace-nowrap block"
@@ -226,9 +226,9 @@ function StatItem({
           fontFamily:
             'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
           fontWeight: 400,
-          fontSize: 'clamp(2.2rem, 5.6vw, 5rem)',
+          fontSize: 'clamp(1.6rem, 5.6vw, 5rem)',
           letterSpacing: '0.02em',
-          marginBottom: '1.5rem',
+          marginBottom: '1rem',
         }}
       >
         {stat.prefix ?? ''}
@@ -236,10 +236,9 @@ function StatItem({
         {stat.suffix ?? ''}
       </div>
       <p
-        className="font-mono uppercase text-gray-500 block"
+        className="font-mono uppercase text-gray-500 block text-[9px] sm:text-[10px]"
         style={{
-          fontSize: '10px',
-          letterSpacing: '0.4em',
+          letterSpacing: '0.3em',
           lineHeight: 1.4,
         }}
       >

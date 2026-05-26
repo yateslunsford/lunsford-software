@@ -14,6 +14,7 @@ const HeroScene = dynamic(
 /* ─── Copy ─── */
 const HEADLINE_WORDS = ['LUNSFORD', 'SOFTWARE', 'DEVELOPMENT'] as const;
 const SUBLINE        = 'EST. 2026  ·  CUSTOM CODE  ·  SHIPS EVERYWHERE';
+const SUBLINE_MOBILE = 'EST. 2026  ·  CUSTOM  ·  WORLDWIDE';
 
 /* Sharp ease — snappy slam-in (no slow drift) */
 const SLAM = cubicBezier(0.16, 1.04, 0.30, 1.0);
@@ -102,11 +103,11 @@ export default function Hero() {
       />
 
       {/* ── Content ── */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center pointer-events-none">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 sm:px-6 text-center pointer-events-none">
 
         {/* Studio label */}
         <motion.p
-          className="font-mono text-[11px] tracking-[0.55em] text-white/60 mb-9 uppercase"
+          className="font-mono text-[10px] sm:text-[11px] tracking-[0.4em] sm:tracking-[0.55em] text-white/60 mb-6 sm:mb-9 uppercase whitespace-nowrap"
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={reduceMotion ? undefined : { duration: 0.45, ease: SLAM, delay: 0.05 }}
@@ -119,13 +120,14 @@ export default function Hero() {
           className="select-none"
           style={{
             fontFamily:    'var(--font-anton), var(--font-geist-sans), system-ui, sans-serif',
-            fontSize:      'clamp(2.6rem, 9.2vw, 9rem)',
+            fontSize:      'clamp(2.1rem, 9.2vw, 9rem)',
             fontWeight:    400,
             lineHeight:    0.92,
             letterSpacing: '-0.025em',
             color:         '#ffffff',
             margin:        0,
             textShadow:    '0 6px 60px rgba(0,0,0,0.55)',
+            maxWidth:      '94vw',
           }}
         >
           {HEADLINE_WORDS.map((word, i) => (
@@ -154,9 +156,9 @@ export default function Hero() {
           ))}
         </h1>
 
-        {/* Subline */}
+        {/* Subline — desktop */}
         <motion.div
-          className="mt-8 select-none"
+          className="hidden sm:block mt-8 select-none"
           style={{
             fontFamily:    'var(--font-geist-mono, ui-monospace), monospace',
             fontSize:      'clamp(0.62rem, 1.4vw, 0.92rem)',
@@ -170,15 +172,31 @@ export default function Hero() {
           {SUBLINE}
         </motion.div>
 
+        {/* Subline — mobile (shorter) */}
+        <motion.div
+          className="sm:hidden mt-6 select-none"
+          style={{
+            fontFamily:    'var(--font-geist-mono, ui-monospace), monospace',
+            fontSize:      '0.6rem',
+            letterSpacing: '0.22em',
+            color:         'rgba(255,255,255,0.55)',
+          }}
+          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={reduceMotion ? undefined : { duration: 0.55, ease: SLAM, delay: 0.42 }}
+        >
+          {SUBLINE_MOBILE}
+        </motion.div>
+
         {/* CTA stack — pointer events re-enabled here */}
         <motion.div
-          className="mt-12 flex flex-col items-center gap-3 pointer-events-auto"
+          className="mt-10 sm:mt-12 flex flex-col items-center gap-3 pointer-events-auto"
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={reduceMotion ? undefined : { duration: 0.5, ease: SLAM, delay: 0.55 }}
         >
           <MagneticCTA label="Start a project" href="#contact" reduceMotion={reduceMotion} />
-          <p className="font-mono text-[10px] tracking-[0.4em] uppercase text-white/45">
+          <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.3em] sm:tracking-[0.4em] uppercase text-white/45 whitespace-nowrap">
             15-min call  ·  no pitch deck
           </p>
         </motion.div>

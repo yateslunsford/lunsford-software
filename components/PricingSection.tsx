@@ -308,21 +308,21 @@ export default function PricingSection({
   }, []);
 
   return (
-    <section id="services" ref={sectionRef} className="py-10 md:py-12 px-6">
+    <section id="services" ref={sectionRef} className="py-10 md:py-12 px-4 sm:px-6">
       {/* Section header */}
       <motion.div
-        className="text-center mb-10"
+        className="text-center mb-8 sm:mb-10"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-120px' }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-        <p className="font-mono text-xs tracking-[0.45em] text-gray-500 mb-4 uppercase">
+        <p className="font-mono text-[10px] sm:text-xs tracking-[0.35em] sm:tracking-[0.45em] text-gray-500 mb-3 sm:mb-4 uppercase">
           Services  ·  03
         </p>
         <h2
           className="font-extrabold tracking-tight"
-          style={{ fontSize: 'clamp(2.5rem, 7vw, 6rem)', letterSpacing: '-0.035em', lineHeight: 0.96 }}
+          style={{ fontSize: 'clamp(1.95rem, 7vw, 6rem)', letterSpacing: '-0.035em', lineHeight: 0.96 }}
         >
           Three ways<br />to work together.
         </h2>
@@ -349,7 +349,7 @@ export default function PricingSection({
       {/* Mobile: carousel */}
       <div
         ref={carouselRef}
-        className="md:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6"
+        className="md:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6"
         style={{ scrollbarWidth: 'none' }}
       >
         {TIERS.map((tier) => (

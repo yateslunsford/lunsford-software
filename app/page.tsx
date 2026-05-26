@@ -87,7 +87,7 @@ function Pitch() {
   return (
     <section
       ref={ref}
-      className="relative flex items-center justify-center overflow-hidden py-10 md:py-12 min-h-[420px]"
+      className="relative flex items-center justify-center overflow-hidden py-12 sm:py-10 md:py-12 min-h-[380px] sm:min-h-[420px]"
     >
       {/* Floating mock-UI cards — strict B/W palette, no parallax (Lenis already
           gives the section a sense of motion) */}
@@ -140,9 +140,9 @@ function Pitch() {
         </div>
       </FloatingCard>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <motion.p
-          className="font-mono text-xs tracking-[0.45em] text-gray-500 mb-6 uppercase"
+          className="font-mono text-[10px] sm:text-xs tracking-[0.35em] sm:tracking-[0.45em] text-gray-500 mb-5 sm:mb-6 uppercase"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
@@ -152,7 +152,7 @@ function Pitch() {
         </motion.p>
         <motion.h2
           className="font-extrabold leading-[0.96] tracking-tight"
-          style={{ fontSize: 'clamp(2.5rem, 7vw, 6rem)', letterSpacing: '-0.035em' }}
+          style={{ fontSize: 'clamp(1.95rem, 7vw, 6rem)', letterSpacing: '-0.035em' }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
@@ -162,7 +162,7 @@ function Pitch() {
           <span className="text-gray-400">I ship custom builds.</span>
         </motion.h2>
         <motion.p
-          className="mt-7 text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
+          className="mt-6 sm:mt-7 text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: '-100px' }}
@@ -327,13 +327,13 @@ function Process() {
     <section
       id="process"
       ref={sectionRef}
-      className="relative bg-[#fafafa] py-10 md:py-12 px-6"
+      className="relative bg-[#fafafa] py-10 md:py-12 px-4 sm:px-6"
     >
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <p
             ref={eyebrowRef}
-            className="font-mono text-xs tracking-[0.45em] text-gray-500 mb-3 uppercase"
+            className="font-mono text-[10px] sm:text-xs tracking-[0.35em] sm:tracking-[0.45em] text-gray-500 mb-3 uppercase"
           >
             Process  ·  05
           </p>
@@ -341,7 +341,7 @@ function Process() {
             ref={headingRef}
             className="font-extrabold tracking-tight"
             style={{
-              fontSize: 'clamp(2.5rem, 7vw, 6rem)',
+              fontSize: 'clamp(1.95rem, 7vw, 6rem)',
               letterSpacing: '-0.035em',
               lineHeight: 0.96,
             }}
@@ -350,7 +350,7 @@ function Process() {
           </h2>
         </div>
 
-        <div ref={stepsRef} className="relative pl-8 md:pl-10">
+        <div ref={stepsRef} className="relative pl-6 sm:pl-8 md:pl-10">
           {/* Drawing border line */}
           <div
             ref={lineRef}
@@ -360,24 +360,24 @@ function Process() {
 
           <div className="space-y-5 md:space-y-6">
             {STEPS.map((step) => (
-              <div key={step.num} className="process-step relative pl-2 md:pl-4">
+              <div key={step.num} className="process-step relative pl-1 sm:pl-2 md:pl-4">
                 {/* Active dot */}
                 <span
-                  className="absolute -left-[42px] top-3 w-3 h-3 rounded-full bg-black"
+                  className="absolute -left-[31px] sm:-left-[42px] top-3 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-black"
                   aria-hidden="true"
                 />
-                <div className="flex items-start gap-6">
-                  <span className="font-mono text-sm text-gray-400 pt-1 min-w-[3rem]">
+                <div className="flex items-start gap-3 sm:gap-6">
+                  <span className="font-mono text-xs sm:text-sm text-gray-400 pt-1 min-w-[2rem] sm:min-w-[3rem]">
                     {step.num}
                   </span>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <h3
-                      className="text-2xl md:text-4xl font-extrabold mb-2"
+                      className="text-xl sm:text-2xl md:text-4xl font-extrabold mb-1.5 sm:mb-2"
                       style={{ letterSpacing: '-0.025em' }}
                     >
                       {step.title}
                     </h3>
-                    <p className="text-gray-600 text-base md:text-lg max-w-2xl leading-relaxed">
+                    <p className="text-gray-600 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed">
                       {step.desc}
                     </p>
                   </div>
@@ -434,26 +434,26 @@ function About() {
     <section
       id="about"
       ref={sectionRef}
-      className="relative bg-white text-black py-10 md:py-12 px-6 border-t border-black/[0.07]"
+      className="relative bg-white text-black py-10 md:py-12 px-4 sm:px-6 border-t border-black/[0.07]"
     >
       <div className="max-w-4xl mx-auto">
         <p
           ref={eyebrowRef}
-          className="font-mono text-xs tracking-[0.45em] text-gray-500 mb-5 uppercase"
+          className="font-mono text-[10px] sm:text-xs tracking-[0.35em] sm:tracking-[0.45em] text-gray-500 mb-4 sm:mb-5 uppercase"
         >
           About  ·  06
         </p>
         <h2
           ref={headingRef}
-          className="font-extrabold tracking-tight mb-6 leading-[0.96] text-black"
-          style={{ fontSize: 'clamp(2.5rem, 7vw, 6rem)', letterSpacing: '-0.035em' }}
+          className="font-extrabold tracking-tight mb-5 sm:mb-6 leading-[0.96] text-black"
+          style={{ fontSize: 'clamp(1.95rem, 7vw, 6rem)', letterSpacing: '-0.035em' }}
         >
           I&apos;m Yates. 16.<br />Self-taught.{' '}
           <span className="text-black">Based in Newnan, GA.</span>
         </h2>
         <div
           ref={blocksRef}
-          className="space-y-5 text-lg md:text-xl text-gray-700 leading-relaxed"
+          className="space-y-4 sm:space-y-5 text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed"
         >
           <p>
             I started building websites because the agencies in town were charging local businesses
@@ -493,28 +493,28 @@ function Contact() {
   return (
     <section
       id="contact"
-      className="py-10 md:py-12 px-6 border-t border-black/[0.07]"
+      className="py-10 md:py-12 px-4 sm:px-6 border-t border-black/[0.07]"
     >
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6 }}
         >
-          <p className="font-mono text-xs tracking-[0.45em] text-gray-500 mb-3 uppercase">
+          <p className="font-mono text-[10px] sm:text-xs tracking-[0.35em] sm:tracking-[0.45em] text-gray-500 mb-3 uppercase">
             Contact  ·  07
           </p>
           <h2
             className="font-extrabold tracking-tight leading-[0.96]"
-            style={{ fontSize: 'clamp(2.8rem, 8vw, 7.5rem)', letterSpacing: '-0.035em' }}
+            style={{ fontSize: 'clamp(2.1rem, 8vw, 7.5rem)', letterSpacing: '-0.035em' }}
           >
             Let&apos;s build<br />something good.
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-start">
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-start">
           {/* Form */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -562,16 +562,16 @@ function Contact() {
 
           {/* Booking card */}
           <motion.div
-            className="bg-black text-white rounded-2xl p-6 md:p-8"
+            className="bg-black text-white rounded-2xl p-5 sm:p-6 md:p-8"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h3 className="text-2xl font-extrabold mb-4" style={{ letterSpacing: '-0.02em' }}>
+            <h3 className="text-xl sm:text-2xl font-extrabold mb-3 sm:mb-4" style={{ letterSpacing: '-0.02em' }}>
               Or book a free call
             </h3>
-            <p className="text-gray-300 mb-8 leading-relaxed">
+            <p className="text-gray-300 mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">
               15 minutes. We talk about what you&apos;re trying to build, I tell you if I&apos;m the
               right fit, and we go from there. No pressure, no pitch deck.
             </p>
@@ -579,7 +579,7 @@ function Contact() {
               href="https://cal.com/lunsfordsoftware/15min"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-8 py-3.5 bg-white text-black rounded-full text-sm font-semibold transition-all duration-300 hover:bg-gray-200 hover:scale-[1.04] hover:shadow-2xl mb-8"
+              className="inline-block px-6 sm:px-8 py-3 sm:py-3.5 bg-white text-black rounded-full text-sm font-semibold transition-all duration-300 hover:bg-gray-200 hover:scale-[1.04] hover:shadow-2xl mb-6 sm:mb-8"
             >
               Book a 15-min call →
             </a>
@@ -618,13 +618,13 @@ function Footer() {
         <Marquee
           items={['LUNSFORD', '·', 'LUNSFORD', '·', 'LUNSFORD', '·', 'LUNSFORD', '·']}
           speed={22}
-          itemClassName="font-extrabold tracking-tight px-6 leading-none text-black/[0.06]"
-          itemStyle={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
+          itemClassName="font-extrabold tracking-tight px-4 sm:px-6 leading-none text-black/[0.06]"
+          itemStyle={{ fontSize: 'clamp(2.5rem, 9vw, 8rem)' }}
         />
       </div>
-      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-6 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 text-center md:text-left">
         <div className="font-mono">© {new Date().getFullYear()} Lunsford Software Development</div>
-        <div className="font-mono text-xs tracking-widest uppercase">Built in Newnan, GA</div>
+        <div className="font-mono text-[10px] sm:text-xs tracking-widest uppercase">Built in Newnan, GA</div>
       </div>
     </footer>
   );
