@@ -836,7 +836,8 @@ export default function HeroScene({ scrollRef }: HeroSceneProps) {
   return (
     <Canvas
       camera={{ position: [0, 0, 9], fov: 46 }}
-      dpr={[1, 2]}
+      dpr={[1, 1.5]}
+      performance={{ min: 0.5 }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
     >
       <color attach="background" args={['#000003']} />

@@ -40,7 +40,7 @@ export default function Nav() {
 
   return (
     <motion.nav
-      className="fixed top-0 inset-x-0 z-50 backdrop-blur-md border-b transition-colors"
+      className="fixed top-0 inset-x-0 z-50 sm:backdrop-blur-md border-b transition-colors"
       style={{
         background:  lightBg,
         borderColor: borderCol,

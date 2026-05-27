@@ -193,20 +193,25 @@ function StatItem({
 
   useLayoutEffect(() => {
     if (reduceMotion || !ref.current) return;
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia();
+    mm.add({
+      isMobile:  '(max-width: 767px)',
+      isDesktop: '(min-width: 768px)',
+    }, (ctx) => {
+      const { isMobile } = ctx.conditions as Record<string, boolean>;
       gsap.from(ref.current, {
         opacity: 0,
-        y: 28,
-        duration: 0.7,
+        y:        isMobile ? 14 : 28,
+        duration: isMobile ? 0.35 : 0.7,
         ease: 'power3.out',
-        delay: index * 0.12,
+        delay: index * (isMobile ? 0.08 : 0.12),
         scrollTrigger: {
           trigger: ref.current!,
           start: 'top 85%',
         },
       });
-    }, ref);
-    return () => ctx.revert();
+    });
+    return () => mm.revert();
   }, [reduceMotion, index]);
 
   // Vertical divider between every column except the last.

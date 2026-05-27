@@ -40,21 +40,26 @@ export default function FeaturedWork() {
 
   useLayoutEffect(() => {
     if (reduceMotion) return;
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia();
+    mm.add({
+      isMobile:  '(max-width: 767px)',
+      isDesktop: '(min-width: 768px)',
+    }, (ctx) => {
+      const { isMobile } = ctx.conditions as Record<string, boolean>;
       const cards = cardsRef.current?.querySelectorAll<HTMLElement>('.featured-card') ?? [];
       gsap.from(cards, {
         opacity: 0,
-        y: 40,
-        duration: 0.6,
+        y:        isMobile ? 20 : 40,
+        duration: isMobile ? 0.35 : 0.6,
         ease: 'power3.out',
-        stagger: 0.12,
+        stagger:  isMobile ? 0.08 : 0.12,
         scrollTrigger: {
           trigger: cardsRef.current,
-          start: 'top 85%',
+          start:   'top 85%',
         },
       });
-    }, sectionRef);
-    return () => ctx.revert();
+    });
+    return () => mm.revert();
   }, [reduceMotion]);
 
   return (

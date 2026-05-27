@@ -34,7 +34,7 @@ export default function WorkPage() {
 ═══════════════════════════════════════════════════════════ */
 function WorkNav() {
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[#060606]/70 border-b border-white/5">
+    <nav className="fixed top-0 inset-x-0 z-50 sm:backdrop-blur-md bg-[#060606]/90 sm:bg-[#060606]/70 border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
         <Link
           href="/#work"

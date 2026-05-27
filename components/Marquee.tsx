@@ -35,6 +35,7 @@ export default function Marquee({
         className="marquee-track flex whitespace-nowrap will-change-transform"
         style={{
           animation: `${reverse ? 'marqueeReverse' : 'marquee'} ${speed}s linear infinite`,
+          transform: 'translateZ(0)',
         }}
       >
         {track.map((item, i) => (

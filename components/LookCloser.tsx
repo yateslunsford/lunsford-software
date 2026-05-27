@@ -25,6 +25,11 @@ const LookCloserScene = dynamic(
   dragRef:   MutableRefObject<number>;
 }>;
 
+const WorkStarsScene = dynamic(
+  () => import('@/components/WorkStarsScene'),
+  { ssr: false, loading: () => null },
+);
+
 /* ─── Statement slam-ins (progress 0..1) ─── */
 const STATEMENTS = [
   { text: 'EVERY PIXEL.',         range: [0.06, 0.18, 0.28, 0.36] as const },
@@ -87,9 +92,18 @@ export default function LookCloser() {
     <section
       ref={sectionRef}
       className="relative h-screen"
-      style={{ background: '#040407', overflow: 'visible' }}
+      style={{ background: '#000000', overflow: 'visible' }}
     >
-      {/* ── R3F canvas — 100vw × 100vh, overflow visible so nothing clips ── */}
+      {/* ── Star layer — same star implementation as hero, 40 % opacity ── */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ opacity: 0.4 }}
+        aria-hidden="true"
+      >
+        <WorkStarsScene />
+      </div>
+
+      {/* ── R3F canvas — alpha:true so stars show through fogged regions ── */}
       <div
         className="absolute inset-0"
         style={{ overflow: 'visible' }}
@@ -100,7 +114,7 @@ export default function LookCloser() {
               className="absolute inset-0"
               style={{
                 background:
-                  'radial-gradient(ellipse 60% 50% at 50% 55%, #15151a, #040407 60%)',
+                  'radial-gradient(ellipse 60% 50% at 50% 55%, #15151a, #000000 60%)',
               }}
             />
           }

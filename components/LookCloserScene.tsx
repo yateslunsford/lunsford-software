@@ -13,6 +13,8 @@ import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
+
 /* ═══════════════════════════════════════════════════════════
    Util — smoothstep & easeOutCubic
 ═══════════════════════════════════════════════════════════ */
@@ -27,7 +29,7 @@ function easeOutCubic(x: number): number {
 /* ═══════════════════════════════════════════════════════════
    Atmospheric motes — slow, drifting dust
 ═══════════════════════════════════════════════════════════ */
-const MOTE_COUNT = 320;
+const MOTE_COUNT = IS_MOBILE ? 160 : 320;
 
 function buildMoteBuffers() {
   const pos = new Float32Array(MOTE_COUNT * 3);
@@ -378,7 +380,7 @@ function ExpandingRing({ scrollRef }: { scrollRef: MutableRefObject<number> }) {
 /* ═══════════════════════════════════════════════════════════
    ParticleBurst — 3x particles (840) for a much bigger pop
 ═══════════════════════════════════════════════════════════ */
-const BURST_COUNT = 840;
+const BURST_COUNT = IS_MOBILE ? 420 : 840;
 
 function buildBurstBuffers() {
   const pos = new Float32Array(BURST_COUNT * 3);
@@ -550,8 +552,8 @@ function Floor() {
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.85, 0]} receiveShadow>
       <planeGeometry args={[44, 44]} />
       <MeshReflectorMaterial
-        blur={[260, 100]}
-        resolution={1024}
+        blur={IS_MOBILE ? [128, 64] : [260, 100]}
+        resolution={IS_MOBILE ? 512 : 1024}
         mixBlur={1.1}
         mixStrength={56}
         roughness={0.88}
@@ -721,7 +723,8 @@ function Lighting() {
   useEffect(() => {
     if (spotRef.current) {
       // Configure shadow camera for a tight, sharp shadow
-      spotRef.current.shadow.mapSize.set(2048, 2048);
+      const shadowRes = IS_MOBILE ? 512 : 2048;
+      spotRef.current.shadow.mapSize.set(shadowRes, shadowRes);
       spotRef.current.shadow.camera.near = 1;
       spotRef.current.shadow.camera.far  = 30;
       spotRef.current.shadow.bias        = -0.0005;
@@ -778,19 +781,19 @@ export default function LookCloserScene({ scrollRef, dragRef }: LookCloserSceneP
   return (
     <Canvas
       camera={{ position: [0, 1.2, 18], fov: 50 }}
-      dpr={[1, 2]}
-      shadows
+      dpr={[1, 1.5]}
+      performance={{ min: 0.5 }}
+      shadows={!IS_MOBILE}
       gl={{
         antialias: true,
-        alpha: false,
+        alpha: true,
         powerPreference: 'high-performance',
         toneMapping: THREE.ACESFilmicToneMapping,
         toneMappingExposure: 1.1,
       }}
       style={{ width: '100%', height: '100%' }}
     >
-      <color attach="background" args={['#040407']} />
-      <fog   attach="fog"        args={['#040407', 12, 34]} />
+      <fog attach="fog" args={['#000000', 16, 42]} />
 
       <Environment preset="city" environmentIntensity={0.5} />
 
@@ -801,22 +804,24 @@ export default function LookCloserScene({ scrollRef, dragRef }: LookCloserSceneP
       <Structure scrollRef={scrollRef} dragRef={dragRef} />
       <Motes />
 
-      {/* Cinematic post — bloom for the chrome highlights + soft vignette */}
-      <EffectComposer multisampling={0} enableNormalPass={false}>
-        <Bloom
-          mipmapBlur
-          luminanceThreshold={0.3}
-          luminanceSmoothing={0.4}
-          intensity={0.8}
-          radius={0.7}
-        />
-        <Vignette
-          eskil={false}
-          offset={0.18}
-          darkness={0.55}
-          blendFunction={BlendFunction.NORMAL}
-        />
-      </EffectComposer>
+      {/* Cinematic post — disabled on mobile for 60fps target */}
+      {!IS_MOBILE && (
+        <EffectComposer multisampling={0} enableNormalPass={false}>
+          <Bloom
+            mipmapBlur
+            luminanceThreshold={0.3}
+            luminanceSmoothing={0.4}
+            intensity={0.8}
+            radius={0.7}
+          />
+          <Vignette
+            eskil={false}
+            offset={0.18}
+            darkness={0.55}
+            blendFunction={BlendFunction.NORMAL}
+          />
+        </EffectComposer>
+      )}
     </Canvas>
   );
 }

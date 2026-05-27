@@ -127,6 +127,7 @@ export default function WorkStarsScene() {
     <Canvas
       camera={{ position: [0, 0, 9], fov: 46 }}
       dpr={[1, 1.5]}
+      performance={{ min: 0.5 }}
       gl={{ antialias: false, alpha: true, powerPreference: 'default' }}
     >
       <WorkStars />

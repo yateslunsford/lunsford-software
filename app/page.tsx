@@ -266,61 +266,43 @@ function Process() {
   const lineRef    = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      // Heading first
+    const mm = gsap.matchMedia();
+    mm.add({
+      isMobile:  '(max-width: 767px)',
+      isDesktop: '(min-width: 768px)',
+    }, (ctx) => {
+      const { isMobile } = ctx.conditions as Record<string, boolean>;
+      const yHead  = isMobile ? 16 : 40;
+      const durH   = isMobile ? 0.4 : 0.8;
+
       gsap.from(eyebrowRef.current, {
-        opacity: 0,
-        y: 20,
-        duration: 0.55,
+        opacity: 0, y: 12, duration: isMobile ? 0.3 : 0.55,
         ease: 'power3.out',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 85%',
-        },
+        scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' },
       });
       gsap.from(headingRef.current, {
-        opacity: 0,
-        y: 40,
-        duration: 0.8,
+        opacity: 0, y: yHead, duration: durH, delay: 0.1,
         ease: 'power3.out',
-        delay: 0.1,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 85%',
-        },
+        scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' },
       });
 
-      // Border line draws downward
-      gsap.fromTo(
-        lineRef.current,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          duration: 1.2,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: stepsRef.current,
-            start: 'top 85%',
-          },
-        },
-      );
+      gsap.fromTo(lineRef.current, { scaleY: 0 }, {
+        scaleY: 1, duration: isMobile ? 0.7 : 1.2, ease: 'power2.out',
+        scrollTrigger: { trigger: stepsRef.current, start: 'top 85%' },
+      });
 
-      // Steps stagger in
       const stepNodes = stepsRef.current?.querySelectorAll<HTMLElement>('.process-step') ?? [];
       gsap.from(stepNodes, {
         opacity: 0,
-        y: 50,
-        duration: 0.75,
+        y:        isMobile ? 22 : 50,
+        duration: isMobile ? 0.4 : 0.75,
         ease: 'power3.out',
-        stagger: 0.15,
-        scrollTrigger: {
-          trigger: stepsRef.current,
-          start: 'top 85%',
-        },
+        stagger:  isMobile ? 0.1 : 0.15,
+        scrollTrigger: { trigger: stepsRef.current, start: 'top 85%' },
       });
-    }, sectionRef);
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
   return (
@@ -401,33 +383,33 @@ function About() {
   const blocksRef  = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia();
+    mm.add({
+      isMobile:  '(max-width: 767px)',
+      isDesktop: '(min-width: 768px)',
+    }, (ctx) => {
+      const { isMobile } = ctx.conditions as Record<string, boolean>;
       gsap.from(eyebrowRef.current, {
-        opacity: 0,
-        y: 20,
-        duration: 0.55,
+        opacity: 0, y: 12, duration: isMobile ? 0.3 : 0.55,
         ease: 'power3.out',
         scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' },
       });
       gsap.from(headingRef.current, {
-        opacity: 0,
-        y: 40,
-        duration: 0.8,
+        opacity: 0, y: isMobile ? 18 : 40, duration: isMobile ? 0.4 : 0.8, delay: 0.1,
         ease: 'power3.out',
-        delay: 0.1,
         scrollTrigger: { trigger: sectionRef.current, start: 'top 85%' },
       });
       const blocks = blocksRef.current?.querySelectorAll<HTMLElement>('p') ?? [];
       gsap.from(blocks, {
         opacity: 0,
-        y: 28,
-        duration: 0.7,
+        y:        isMobile ? 14 : 28,
+        duration: isMobile ? 0.35 : 0.7,
         ease: 'power3.out',
-        stagger: 0.12,
+        stagger:  isMobile ? 0.08 : 0.12,
         scrollTrigger: { trigger: blocksRef.current, start: 'top 85%' },
       });
-    }, sectionRef);
-    return () => ctx.revert();
+    });
+    return () => mm.revert();
   }, []);
 
   return (

@@ -203,9 +203,21 @@ export default function Hero() {
 
       </div>
 
+      {/* ── Bottom blend — fades hero stars into LookCloser's black.
+            z-5 keeps it above the canvas overlays but behind content (z-10). ── */}
+      <div
+        className="absolute inset-x-0 bottom-0 pointer-events-none"
+        style={{
+          height: '30vh',
+          zIndex: 5,
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.55) 60%, #000000 100%)',
+        }}
+        aria-hidden="true"
+      />
+
       {/* ── Scroll hint ── */}
       <motion.div
-        className="absolute bottom-7 inset-x-0 flex flex-col items-center gap-2 pointer-events-none"
+        className="absolute bottom-7 inset-x-0 flex flex-col items-center gap-2 pointer-events-none z-10"
         aria-hidden="true"
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={reduceMotion ? undefined : { opacity: 1 }}
