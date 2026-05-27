@@ -14,6 +14,15 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   useEffect(() => {
     gsap.config({ force3D: true });
 
+    /* Easter egg — styled console greeting for curious devs */
+    // eslint-disable-next-line no-console
+    console.log(
+      '%c  LUNSFORD SOFTWARE DEVELOPMENT  \n%c  Built by Yates Lunsford · 16 · Newnan, GA  \n%c  Curious? → ylunsford1@gmail.com  ',
+      'background:#000;color:#fff;font-size:14px;font-weight:bold;padding:6px 12px;',
+      'background:#000;color:#9ca3af;font-size:11px;padding:2px 12px;',
+      'background:#000;color:#6b7280;font-size:11px;padding:2px 12px 6px;',
+    );
+
     const lenis = new Lenis({
       duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

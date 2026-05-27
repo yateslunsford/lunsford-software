@@ -19,13 +19,18 @@ const NOISE_SVG = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/20
 ═══════════════════════════════════════════════════════════ */
 export default function WorkPage() {
   return (
-    <main className="bg-[#060606] text-white">
+    <motion.main
+      className="bg-[#060606] text-white"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+    >
       <WorkNav />
       <WorkHeader />
       <ProjectGrid />
       <StartCTA />
       <BackToTop />
-    </main>
+    </motion.main>
   );
 }
 

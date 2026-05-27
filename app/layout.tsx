@@ -5,6 +5,8 @@ import SmoothScroll from "@/components/SmoothScroll";
 import PageLoader from "@/components/PageLoader";
 import ScrollProgress from "@/components/ScrollProgress";
 import CursorGlow from "@/components/CursorGlow";
+import FilmGrain from "@/components/FilmGrain";
+import BackToTop from "@/components/BackToTop";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -33,9 +35,53 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Lunsford Software Development",
+  metadataBase: new URL("https://lunsfordsoftware.com"),
+  title: "Lunsford Software Development — Custom Sites Built in Newnan, GA",
   description:
-    "Custom websites and web applications. Built fast, built right. Based in Newnan, GA.",
+    "Custom websites and web applications built from scratch. No templates, no page builders. Hand-coded, fast, mobile-first. Based in Newnan, GA.",
+  keywords: [
+    "web developer Newnan GA",
+    "custom website development",
+    "Next.js developer",
+    "freelance web developer Georgia",
+    "small business website",
+  ],
+  authors: [{ name: "Yates Lunsford" }],
+  creator: "Yates Lunsford",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://lunsfordsoftware.com",
+    siteName: "Lunsford Software Development",
+    title: "Lunsford Software Development — Custom Sites Built Right",
+    description:
+      "Custom websites built from scratch. No templates. Hand-coded, fast, mobile-first. Starting at $800. Based in Newnan, GA.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Lunsford Software Development",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Lunsford Software Development",
+    description: "Custom websites built from scratch. No templates. Fast, mobile-first. Based in Newnan, GA.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -52,6 +98,8 @@ export default function RootLayout({
           <PageLoader />
           <ScrollProgress />
           <CursorGlow />
+          <FilmGrain />
+          <BackToTop />
           {children}
         </SmoothScroll>
       </body>

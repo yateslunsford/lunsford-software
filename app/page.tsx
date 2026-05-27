@@ -258,6 +258,45 @@ const STEPS = [
   { num: '04', title: 'Launch',    desc: 'Live on the web with everything set up — hosting, domain, analytics, the works.' },
 ] as const;
 
+/* Monoline SVG icons for each step — 18×18 viewBox */
+function StepIcon({ num }: { num: string }) {
+  const common = {
+    width: 18, height: 18,
+    viewBox: '0 0 18 18',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.4,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    className: 'text-gray-400 flex-shrink-0',
+  };
+  if (num === '01') return (
+    <svg {...common} aria-hidden="true">
+      <circle cx="8" cy="8" r="5.5"/>
+      <line x1="12.2" y1="12.2" x2="16" y2="16"/>
+    </svg>
+  );
+  if (num === '02') return (
+    <svg {...common} aria-hidden="true">
+      <path d="M13 2l3 3L6 15H3v-3L13 2z"/>
+      <line x1="11" y1="4" x2="14" y2="7"/>
+    </svg>
+  );
+  if (num === '03') return (
+    <svg {...common} aria-hidden="true">
+      <polyline points="6 4 2 9 6 14"/>
+      <polyline points="12 4 16 9 12 14"/>
+    </svg>
+  );
+  return (
+    <svg {...common} aria-hidden="true">
+      <path d="M9 1C6 5 5 8 5 11h8c0-3-1-6-4-10z"/>
+      <line x1="9" y1="11" x2="9" y2="14"/>
+      <line x1="6.5" y1="14" x2="11.5" y2="14"/>
+    </svg>
+  );
+}
+
 function Process() {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -348,10 +387,11 @@ function Process() {
                   className="absolute -left-[31px] sm:-left-[42px] top-3 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-black"
                   aria-hidden="true"
                 />
-                <div className="flex items-start gap-3 sm:gap-6">
-                  <span className="font-mono text-xs sm:text-sm text-gray-400 pt-1 min-w-[2rem] sm:min-w-[3rem]">
-                    {step.num}
-                  </span>
+                <div className="flex items-start gap-3 sm:gap-5">
+                  <div className="flex flex-col items-center gap-1.5 pt-0.5 flex-shrink-0 w-8 sm:w-10">
+                    <StepIcon num={step.num} />
+                    <span className="font-mono text-[9px] sm:text-[10px] text-gray-400">{step.num}</span>
+                  </div>
                   <div className="flex-1 min-w-0">
                     <h3
                       className="text-xl sm:text-2xl md:text-4xl font-extrabold mb-1.5 sm:mb-2"
@@ -450,6 +490,73 @@ function About() {
             That&apos;s the whole pitch. Quality work, fair price, and someone who actually picks up.
           </p>
         </div>
+
+        {/* Skills grid */}
+        <div className="mt-10 sm:mt-12">
+          <p className="font-mono text-[10px] sm:text-[11px] tracking-[0.35em] uppercase text-gray-400 mb-5">
+            Stack
+          </p>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
+            {[
+              'Next.js', 'TypeScript', 'React', 'Tailwind',
+              'GSAP', 'Three.js', 'Sanity CMS', 'Stripe',
+              'Twilio', 'Vercel', 'Git', 'Figma',
+            ].map((skill) => (
+              <motion.div
+                key={skill}
+                className="px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg border border-black/[0.08] text-center"
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.4 }}
+              >
+                <span className="font-mono text-[9px] sm:text-[10px] text-gray-600 tracking-wide">
+                  {skill}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="mt-10 sm:mt-12">
+          <p className="font-mono text-[10px] sm:text-[11px] tracking-[0.35em] uppercase text-gray-400 mb-5">
+            Timeline
+          </p>
+          <div className="relative pl-5 sm:pl-6 space-y-4 sm:space-y-5">
+            <div
+              className="absolute left-0 top-0 w-px h-full"
+              style={{ background: 'linear-gradient(to bottom, #0a0a0a 0%, rgba(0,0,0,0.08) 100%)' }}
+              aria-hidden="true"
+            />
+            {[
+              { date: '2026',      label: 'Started self-teaching web development' },
+              { date: 'May 2026',  label: 'First paid project — Ruined Visions streetwear drop ($300)' },
+              { date: 'May 2026',  label: 'Launched Lunsford Software portfolio' },
+              { date: 'Coming',    label: 'LLC filing' },
+              { date: 'Coming',    label: 'Scale to more clients' },
+            ].map(({ date, label }, i) => (
+              <motion.div
+                key={i}
+                className="relative flex items-start gap-3 sm:gap-4"
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.4, delay: i * 0.07 }}
+              >
+                <span
+                  className="absolute -left-5 sm:-left-6 top-[7px] w-1.5 h-1.5 rounded-full bg-black"
+                  aria-hidden="true"
+                />
+                <span className="font-mono text-[9px] sm:text-[10px] text-gray-400 tracking-wide min-w-[60px] sm:min-w-[72px] pt-0.5">
+                  {date}
+                </span>
+                <span className="text-sm sm:text-base text-gray-700">{label}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   );
@@ -514,19 +621,25 @@ function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                <label htmlFor="contact-name" className="sr-only">Your name</label>
                 <input
+                  id="contact-name"
                   type="text" required placeholder="Your name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
                 />
+                <label htmlFor="contact-email" className="sr-only">Email address</label>
                 <input
+                  id="contact-email"
                   type="email" required placeholder="Email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-4 py-3 bg-white border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
                 />
+                <label htmlFor="contact-message" className="sr-only">What are you trying to build?</label>
                 <textarea
+                  id="contact-message"
                   required rows={5} placeholder="What are you trying to build?"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -591,22 +704,109 @@ function Contact() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   FOOTER  — oversized wordmark marquee
+   FOOTER  — 4-column layout with oversized wordmark marquee
 ═══════════════════════════════════════════════════════════ */
 function Footer() {
   return (
-    <footer className="border-t border-black/10 overflow-hidden bg-[#fafafa]">
-      <div className="py-4 border-b border-black/[0.04] overflow-hidden">
+    <footer className="border-t border-black/[0.08] overflow-hidden bg-[#fafafa]">
+      {/* Big watermark marquee */}
+      <div className="py-4 border-b border-black/[0.04] overflow-hidden" aria-hidden="true">
         <Marquee
           items={['LUNSFORD', '·', 'LUNSFORD', '·', 'LUNSFORD', '·', 'LUNSFORD', '·']}
           speed={22}
-          itemClassName="font-extrabold tracking-tight px-4 sm:px-6 leading-none text-black/[0.06]"
+          itemClassName="font-extrabold tracking-tight px-4 sm:px-6 leading-none text-black/[0.05]"
           itemStyle={{ fontSize: 'clamp(2.5rem, 9vw, 8rem)' }}
         />
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-6 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 text-center md:text-left">
-        <div className="font-mono">© {new Date().getFullYear()} Lunsford Software Development</div>
-        <div className="font-mono text-[10px] sm:text-xs tracking-widest uppercase">Built in Newnan, GA</div>
+
+      {/* 4-column body */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
+
+          {/* Col 1 — Logo + tagline */}
+          <div className="col-span-2 md:col-span-1">
+            <a href="#" className="inline-block font-mono text-sm font-semibold tracking-tight text-[#0a0a0a] mb-3">
+              LUNSFORD<span className="text-gray-400">/SOFTWARE</span>
+            </a>
+            <p className="text-xs sm:text-sm text-gray-500 leading-relaxed max-w-[200px]">
+              Custom code. Built from scratch. Ships everywhere.
+              Based in Newnan, GA.
+            </p>
+          </div>
+
+          {/* Col 2 — Navigation */}
+          <div>
+            <p className="font-mono text-[9px] tracking-[0.32em] uppercase text-gray-400 mb-4">Navigate</p>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'Services', href: '#services' },
+                { label: 'Work',     href: '#work' },
+                { label: 'Process',  href: '#process' },
+                { label: 'About',    href: '#about' },
+                { label: 'Contact',  href: '#contact' },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  <a href={href} className="text-xs sm:text-sm text-gray-600 hover:text-[#0a0a0a] transition-colors">
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 3 — Contact */}
+          <div>
+            <p className="font-mono text-[9px] tracking-[0.32em] uppercase text-gray-400 mb-4">Contact</p>
+            <ul className="space-y-2.5">
+              <li>
+                <a href="mailto:ylunsford1@gmail.com" className="text-xs sm:text-sm text-gray-600 hover:text-[#0a0a0a] transition-colors break-all">
+                  ylunsford1@gmail.com
+                </a>
+              </li>
+              <li>
+                <a href="tel:4702152012" className="text-xs sm:text-sm text-gray-600 hover:text-[#0a0a0a] transition-colors">
+                  470-215-2012
+                </a>
+              </li>
+              <li>
+                <span className="text-xs sm:text-sm text-gray-500">Newnan, GA</span>
+              </li>
+              <li className="pt-1">
+                <a
+                  href="https://cal.com/lunsfordsoftware/15min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs sm:text-sm text-gray-600 hover:text-[#0a0a0a] transition-colors"
+                >
+                  Book a free call →
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4 — Stack */}
+          <div>
+            <p className="font-mono text-[9px] tracking-[0.32em] uppercase text-gray-400 mb-4">Built With</p>
+            <ul className="space-y-2.5">
+              {['Next.js 16', 'TypeScript', 'Tailwind CSS', 'GSAP', 'Three.js / R3F', 'Vercel'].map((tech) => (
+                <li key={tech} className="text-xs sm:text-sm text-gray-500">{tech}</li>
+              ))}
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Copyright bar */}
+      <div className="border-t border-black/[0.05]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span className="font-mono text-[10px] text-gray-400">
+            © {new Date().getFullYear()} Lunsford Software Development. All rights reserved.
+          </span>
+          <span className="font-mono text-[10px] tracking-widest uppercase text-gray-400">
+            Built in Newnan, GA
+          </span>
+        </div>
       </div>
     </footer>
   );
@@ -686,19 +886,25 @@ function PricingModal({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            <label htmlFor="modal-name" className="sr-only">Your name</label>
             <input
+              id="modal-name"
               type="text" required placeholder="Your name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-4 py-3 bg-gray-50 border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
             />
+            <label htmlFor="modal-email" className="sr-only">Email address</label>
             <input
+              id="modal-email"
               type="email" required placeholder="Email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-4 py-3 bg-gray-50 border border-black/10 rounded-xl focus:outline-none focus:border-black transition-colors"
             />
+            <label htmlFor="modal-message" className="sr-only">Project details</label>
             <textarea
+              id="modal-message"
               required rows={4}
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}

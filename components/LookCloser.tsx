@@ -53,7 +53,14 @@ export default function LookCloser() {
     if (!sectionRef.current) return;
 
     const driver = { value: 0 };
-    const ctx = gsap.context(() => {
+
+    const mm = gsap.matchMedia();
+    mm.add({
+      isMobile:  '(max-width: 767px)',
+      isDesktop: '(min-width: 768px)',
+    }, (ctx) => {
+      const { isMobile } = ctx.conditions as Record<string, boolean>;
+
       gsap.fromTo(
         driver,
         { value: 0 },
@@ -67,17 +74,17 @@ export default function LookCloser() {
           scrollTrigger: {
             trigger: sectionRef.current!,
             start:   'top top',
-            end:     '+=3000',
+            end:     isMobile ? '+=2000' : '+=3000',
             pin:     true,
-            scrub:   1.5,
+            scrub:   isMobile ? 1.0 : 1.5,
             anticipatePin: 1,
             invalidateOnRefresh: true,
           },
         },
       );
-    }, sectionRef);
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, [progress]);
 
   /* ── Overlay motion values ── */

@@ -53,3 +53,30 @@ html {
     animation-play-state: paused !important;
   }
 }
+
+/* ─── Skeleton shimmer keyframe ─── */
+@keyframes skeletonShimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* ─── Focus rings — visible keyboard navigation ─── */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #0a0a0a;
+  outline-offset: 3px;
+}
+
+/* Override for dark backgrounds */
+.bg-black a:focus-visible,
+.bg-black button:focus-visible,
+[style*="background: #000"] a:focus-visible,
+[style*="background: #000"] button:focus-visible {
+  outline-color: #ffffff;
+}

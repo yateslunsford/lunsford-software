@@ -215,16 +215,23 @@ export default function Hero() {
         aria-hidden="true"
       />
 
-      {/* ── Scroll hint ── */}
+      {/* ── Scroll hint — animated pulse dot ── */}
       <motion.div
-        className="absolute bottom-7 inset-x-0 flex flex-col items-center gap-2 pointer-events-none z-10"
+        className="absolute bottom-7 inset-x-0 flex flex-col items-center gap-3 pointer-events-none z-10"
         aria-hidden="true"
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={reduceMotion ? undefined : { opacity: 1 }}
-        transition={reduceMotion ? undefined : { duration: 0.8, delay: 0.95 }}
+        transition={reduceMotion ? undefined : { duration: 0.8, delay: 1.1 }}
       >
-        <div className="w-px h-10 bg-gradient-to-b from-transparent via-white/50 to-transparent" />
-        <span className="font-mono text-[9px] tracking-[0.55em] uppercase text-white/45">
+        <motion.div
+          className="flex flex-col items-center gap-1"
+          animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
+          transition={reduceMotion ? undefined : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div className="w-px h-8 bg-gradient-to-b from-transparent via-white/40 to-white/75" />
+          <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
+        </motion.div>
+        <span className="font-mono text-[9px] tracking-[0.55em] uppercase text-white/40">
           scroll
         </span>
       </motion.div>

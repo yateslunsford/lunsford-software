@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import gsap from 'gsap';
@@ -8,6 +8,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import { projects, type Project } from '@/lib/projects';
 import MagneticCTA from '@/components/MagneticCTA';
 import Button from '@/components/ui/Button';
+import Marquee from '@/components/Marquee';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -77,6 +78,39 @@ export default function FeaturedWork() {
         <WorkStarsScene />
       </div>
 
+      {/* LUNSFORD watermark — atmospheric large text drifting behind cards */}
+      <div
+        className="absolute inset-0 pointer-events-none overflow-hidden flex flex-col justify-center gap-6"
+        aria-hidden="true"
+        style={{ opacity: 0.045, userSelect: 'none' }}
+      >
+        <Marquee
+          items={['LUNSFORD', '·', 'SOFTWARE', '·', 'CUSTOM', '·', 'CODE', '·']}
+          speed={18}
+          itemClassName="leading-none px-6"
+          itemStyle={{
+            fontFamily: 'var(--font-anton), system-ui, sans-serif',
+            fontSize: 'clamp(4rem, 14vw, 14rem)',
+            color: '#ffffff',
+            letterSpacing: '-0.03em',
+            fontWeight: 400,
+          }}
+        />
+        <Marquee
+          items={['BUILT', '·', 'FROM', '·', 'SCRATCH', '·', 'SHIPS', '·', 'EVERYWHERE', '·']}
+          speed={14}
+          reverse
+          itemClassName="leading-none px-6"
+          itemStyle={{
+            fontFamily: 'var(--font-anton), system-ui, sans-serif',
+            fontSize: 'clamp(3rem, 10vw, 10rem)',
+            color: '#ffffff',
+            letterSpacing: '-0.03em',
+            fontWeight: 400,
+          }}
+        />
+      </div>
+
       {/* Animated film-grain overlay */}
       <NoiseGrain reduceMotion={reduceMotion} />
 
@@ -103,8 +137,8 @@ export default function FeaturedWork() {
 
         {/* ── PRIORITY 3: Cards — fade-up on scroll, no swipe ── */}
         <div ref={cardsRef} className="space-y-6 sm:space-y-8">
-          {projects.map((p) => (
-            <ProjectCard key={p.slug} project={p} reduceMotion={reduceMotion} />
+          {projects.map((p, i) => (
+            <ProjectCard key={p.slug} project={p} index={i} reduceMotion={reduceMotion} />
           ))}
         </div>
 
@@ -119,20 +153,35 @@ export default function FeaturedWork() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PROJECT CARD — static layout; hover scale via Framer Motion
+   PROJECT CARD — static layout; hover tilt + scale
 ═══════════════════════════════════════════════════════════ */
 function ProjectCard({
   project,
+  index,
   reduceMotion,
 }: {
   project: Project;
+  index: number;
   reduceMotion: boolean;
 }) {
   const isExternal = project.url.startsWith('http');
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduceMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width;
+    const ny = (e.clientY - rect.top) / rect.height;
+    setTilt({ x: (ny - 0.5) * -7, y: (nx - 0.5) * 7 });
+  };
+
+  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
 
   return (
     <motion.div
       className="featured-card group relative w-full overflow-hidden"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       style={{
         height:       'clamp(340px, 52vh, 480px)',
         background:   project.color,
@@ -140,13 +189,25 @@ function ProjectCard({
         border:       `1.5px solid ${hexToRgba(project.accentColor, 0.32)}`,
         boxShadow:    '0 50px 120px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,255,255,0.06)',
         willChange:   'transform',
+        perspective:  '1200px',
+        transform:    `perspective(1200px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition:   reduceMotion ? 'none' : 'transform 0.35s ease-out',
       }}
       whileHover={
         reduceMotion
           ? undefined
-          : { scale: 1.015, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }
+          : { scale: 1.012, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }
       }
     >
+      {/* Project number indicator */}
+      <span
+        className="absolute top-4 sm:top-6 left-4 sm:left-6 font-mono text-[9px] sm:text-[10px] tracking-[0.25em] pointer-events-none select-none z-10"
+        style={{ color: hexToRgba(project.accentColor, 0.28) }}
+        aria-hidden="true"
+      >
+        {String(index + 1).padStart(2, '0')}
+      </span>
+
       {/* Accent border — visible on hover */}
       <div
         className="absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"

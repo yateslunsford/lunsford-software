@@ -53,17 +53,4 @@ export const projects: Project[] = [
     accentColor: '#c4c4c4',
     status: 'in-progress',
   },
-  {
-    slug: 'buckley-trash',
-    title: 'Buckley Trash Removal',
-    client: 'Coming Soon',
-    tags: ['Local Business', 'Tier 1', 'Lead Gen'],
-    year: '2026',
-    description:
-      'Local junk removal business site. Clean, fast, built to rank on Google and convert mobile visitors.',
-    url: '#',
-    color:       '#050505',
-    accentColor: '#a8a8a8',
-    status: 'in-progress',
-  },
 ];

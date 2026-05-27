@@ -44,7 +44,14 @@ export default function StatsBand() {
   return (
     <section
       aria-label="By the numbers"
-      className="relative bg-[#fafafa] border-t border-black/[0.08] border-b border-black/[0.08] overflow-hidden"
+      className="relative bg-[#fafafa] border-y border-black/[0.08] overflow-hidden"
+      style={{
+        backgroundImage: [
+          'linear-gradient(to right, rgba(0,0,0,0.035) 1px, transparent 1px)',
+          'linear-gradient(to bottom, rgba(0,0,0,0.035) 1px, transparent 1px)',
+        ].join(', '),
+        backgroundSize: '80px 80px',
+      }}
     >
       <ParallaxStrip />
       <StatsBlock />
@@ -131,6 +138,29 @@ function StatsBlock() {
               next[i] = Math.round(d.value);
               return next;
             });
+          },
+          onComplete: () => {
+            /* Three rapid digit scrambles → settle on final value */
+            let pass = 0;
+            const scramble = () => {
+              if (pass < 3) {
+                setCounts((prev) => {
+                  const next = prev.slice();
+                  const target = STATS[i].value;
+                  next[i] = Math.floor(target * (0.88 + Math.random() * 0.18));
+                  return next;
+                });
+                pass++;
+                window.setTimeout(scramble, 60);
+              } else {
+                setCounts((prev) => {
+                  const next = prev.slice();
+                  next[i] = STATS[i].value;
+                  return next;
+                });
+              }
+            };
+            window.setTimeout(scramble, 20);
           },
           scrollTrigger: {
             trigger: gridRef.current!,
