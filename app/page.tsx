@@ -575,7 +575,7 @@ function Contact() {
     const body    = encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`,
     );
-    window.open(`mailto:ylunsford1@gmail.com?subject=${subject}&body=${body}`);
+    window.open(`mailto:lunsfordsoftware@gmail.com?subject=${subject}&body=${body}`);
     setSubmitted(true);
   };
 
@@ -681,8 +681,8 @@ function Contact() {
             <div className="pt-6 border-t border-white/10 space-y-3 text-sm">
               <div className="flex items-center gap-3 text-gray-400">
                 <span className="font-mono text-xs tracking-widest uppercase w-16">Email</span>
-                <a href="mailto:ylunsford1@gmail.com" className="text-white hover:text-gray-300 transition-colors">
-                  ylunsford1@gmail.com
+                <a href="mailto:lunsfordsoftware@gmail.com" className="text-white hover:text-gray-300 transition-colors">
+                  lunsfordsoftware@gmail.com
                 </a>
               </div>
               <div className="flex items-center gap-3 text-gray-400">
@@ -759,8 +759,8 @@ function Footer() {
             <p className="font-mono text-[9px] tracking-[0.32em] uppercase text-gray-400 mb-4">Contact</p>
             <ul className="space-y-2.5">
               <li>
-                <a href="mailto:ylunsford1@gmail.com" className="text-xs sm:text-sm text-gray-600 hover:text-[#0a0a0a] transition-colors break-all">
-                  ylunsford1@gmail.com
+                <a href="mailto:lunsfordsoftware@gmail.com" className="text-xs sm:text-sm text-gray-600 hover:text-[#0a0a0a] transition-colors break-all">
+                  lunsfordsoftware@gmail.com
                 </a>
               </li>
               <li>
@@ -844,7 +844,7 @@ function PricingModal({
     const body    = encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`,
     );
-    window.open(`mailto:ylunsford1@gmail.com?subject=${subject}&body=${body}`);
+    window.open(`mailto:lunsfordsoftware@gmail.com?subject=${subject}&body=${body}`);
     setSubmitted(true);
   };
 
