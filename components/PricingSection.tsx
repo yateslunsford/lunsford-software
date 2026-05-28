@@ -191,7 +191,7 @@ function MobileCard({ tier, onSelect }: { tier: Tier; onSelect: () => void }) {
 
   return (
     <div
-      className={`snap-center shrink-0 w-[290px] p-6 rounded-2xl border ${
+      className={`snap-center shrink-0 w-[85vw] p-6 rounded-2xl border ${
         featured
           ? 'bg-black text-white border-white/20 shadow-2xl'
           : 'bg-white text-black border-black/10 shadow-2xl'
@@ -260,6 +260,7 @@ export default function PricingSection({
   const hasAnimated  = useRef(false);
 
   const [hovered, setHovered] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState(1);
 
   useLayoutEffect(() => {
     const wrappers = containerRef.current?.querySelectorAll<HTMLElement>('.card-wrapper');
@@ -307,6 +308,27 @@ export default function PricingSection({
     });
   }, []);
 
+  /* Mobile: track active card for dot indicators */
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const mid = el.scrollLeft + el.offsetWidth / 2;
+      let nearest = 0;
+      let best = Infinity;
+      Array.from(el.children).forEach((child, i) => {
+        const c = child as HTMLElement;
+        const dist = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+        if (dist < best) { best = dist; nearest = i; }
+      });
+      setActiveIndex(nearest);
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <section id="services" ref={sectionRef} className="py-10 md:py-12 px-4 sm:px-6">
       {/* Section header */}
@@ -349,14 +371,35 @@ export default function PricingSection({
       {/* Mobile: carousel */}
       <div
         ref={carouselRef}
-        className="md:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6"
-        style={{ scrollbarWidth: 'none' }}
+        className="md:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 hide-scrollbar"
       >
         {TIERS.map((tier) => (
           <MobileCard
             key={tier.index}
             tier={tier}
             onSelect={() => onTierSelect({ tier: tier.title, price: tier.price })}
+          />
+        ))}
+      </div>
+
+      {/* Dot indicators */}
+      <div className="md:hidden flex justify-center gap-2 mt-5" aria-label="Service tier indicators">
+        {TIERS.map((tier, i) => (
+          <button
+            key={tier.index}
+            aria-label={`${tier.title} ${tier.price}`}
+            onClick={() => {
+              const el = carouselRef.current;
+              if (!el) return;
+              const card = el.children[i] as HTMLElement;
+              el.scrollTo({
+                left: card.offsetLeft - (el.offsetWidth - card.offsetWidth) / 2,
+                behavior: 'smooth',
+              });
+            }}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i === activeIndex ? 'w-5 bg-black' : 'w-1.5 bg-black/25'
+            }`}
           />
         ))}
       </div>

@@ -36,52 +36,30 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lunsfordsoftware.com"),
-  title: "Lunsford Software Development — Custom Sites Built in Newnan, GA",
-  description:
-    "Custom websites and web applications built from scratch. No templates, no page builders. Hand-coded, fast, mobile-first. Based in Newnan, GA.",
-  keywords: [
-    "web developer Newnan GA",
-    "custom website development",
-    "Next.js developer",
-    "freelance web developer Georgia",
-    "small business website",
-  ],
-  authors: [{ name: "Yates Lunsford" }],
-  creator: "Yates Lunsford",
+  title: 'Lunsford Software Development',
+  description: 'Custom websites built from scratch. Based in Newnan, GA. Fast, clean, and built to convert.',
+  metadataBase: new URL('https://lunsford-software.vercel.app'),
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://lunsfordsoftware.com",
-    siteName: "Lunsford Software Development",
-    title: "Lunsford Software Development — Custom Sites Built Right",
-    description:
-      "Custom websites built from scratch. No templates. Hand-coded, fast, mobile-first. Starting at $800. Based in Newnan, GA.",
+    title: 'Lunsford Software Development',
+    description: 'Custom websites built from scratch. Based in Newnan, GA.',
+    url: 'https://lunsford-software.vercel.app',
+    siteName: 'Lunsford Software Development',
     images: [
       {
-        url: "/og-image.png",
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: "Lunsford Software Development",
+        alt: 'Lunsford Software Development',
       },
     ],
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Lunsford Software Development",
-    description: "Custom websites built from scratch. No templates. Fast, mobile-first. Based in Newnan, GA.",
-    images: ["/og-image.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+    card: 'summary_large_image',
+    title: 'Lunsford Software Development',
+    description: 'Custom websites built from scratch. Based in Newnan, GA.',
+    images: ['/og-image.png'],
   },
 };
 
