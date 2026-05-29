@@ -15,7 +15,6 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     gsap.config({ force3D: true });
 
     /* Easter egg — styled console greeting for curious devs */
-    // eslint-disable-next-line no-console
     console.log(
       '%c  LUNSFORD SOFTWARE DEVELOPMENT  \n%c  Built by Yates Lunsford · 16 · Newnan, GA  \n%c  Curious? → lunsfordsoftware@gmail.com  ',
       'background:#000;color:#fff;font-size:14px;font-weight:bold;padding:6px 12px;',

@@ -54,7 +54,7 @@ export default function Image(): ImageResponse {
             letterSpacing: '0.05em',
           }}
         >
-          lunsford-software.vercel.app
+          lunsfordsoftware.com
         </div>
       </div>
     ),

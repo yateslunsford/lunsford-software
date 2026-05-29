@@ -8,6 +8,7 @@ import {
 } from 'framer-motion';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import { LogoMark } from '@/components/Logo';
 import Marquee from '@/components/Marquee';
 import PricingSection from '@/components/PricingSection';
 import FeaturedWork from '@/components/FeaturedWork';
@@ -725,7 +726,8 @@ function Footer() {
 
           {/* Col 1 — Logo + tagline */}
           <div className="col-span-2 md:col-span-1">
-            <a href="#" className="inline-block font-mono text-sm font-semibold tracking-tight text-[#0a0a0a] mb-3">
+            <a href="#" className="inline-flex items-center gap-2 font-mono text-sm font-semibold tracking-tight text-[#0a0a0a] mb-3">
+              <LogoMark size={16} />
               LUNSFORD<span className="text-gray-400">/SOFTWARE</span>
             </a>
             <p className="text-xs sm:text-sm text-gray-500 leading-relaxed max-w-[200px]">

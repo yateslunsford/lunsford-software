@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { LogoMark } from '@/components/Logo';
 
 /* ═══════════════════════════════════════════════════════════
    PageLoader — one-shot intro on first paint.
@@ -33,7 +34,7 @@ export default function PageLoader() {
             animate={{ opacity: 1, transition: { duration: 0.25 } }}
             exit={{ opacity: 0, transition: { duration: 0.25 } }}
           >
-            <span className="inline-block w-1.5 h-1.5 bg-white rounded-full" />
+            <LogoMark size={13} />
             Lunsford / Software
           </motion.div>
         </motion.div>

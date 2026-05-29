@@ -95,7 +95,7 @@ function WorkHeader() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 60% 50% at 18% 22%, rgba(180,210,255,0.08), transparent 60%)',
+            'radial-gradient(ellipse 60% 50% at 18% 22%, rgba(255,255,255,0.06), transparent 60%)',
         }}
         aria-hidden="true"
       />

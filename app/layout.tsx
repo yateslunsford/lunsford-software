@@ -38,20 +38,12 @@ const anton = Anton({
 export const metadata: Metadata = {
   title: 'Lunsford Software Development',
   description: 'Custom websites built from scratch. Based in Newnan, GA. Fast, clean, and built to convert.',
-  metadataBase: new URL('https://lunsford-software.vercel.app'),
+  metadataBase: new URL('https://lunsfordsoftware.com'),
   openGraph: {
     title: 'Lunsford Software Development',
     description: 'Custom websites built from scratch. Based in Newnan, GA.',
-    url: 'https://lunsford-software.vercel.app',
+    url: 'https://lunsfordsoftware.com',
     siteName: 'Lunsford Software Development',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Lunsford Software Development',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -59,7 +51,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Lunsford Software Development',
     description: 'Custom websites built from scratch. Based in Newnan, GA.',
-    images: ['/og-image.png'],
   },
 };
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LogoMark } from '@/components/Logo';
 
 interface MobileMenuProps {
   open: boolean;
@@ -54,8 +55,9 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
             <a
               href="#"
               onClick={onClose}
-              className="font-mono text-xs tracking-tight font-semibold text-white"
+              className="font-mono text-xs tracking-tight font-semibold text-white inline-flex items-center gap-2"
             >
+              <LogoMark size={16} />
               LUNSFORD<span className="text-white/45">/SOFTWARE</span>
             </a>
             <button

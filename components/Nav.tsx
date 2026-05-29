@@ -52,20 +52,28 @@ export default function Nav() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+          {/* Terminal wordmark: lunsford.dev█ */}
           <a
             href="#"
-            className="font-mono text-xs sm:text-sm tracking-tight font-semibold transition-colors whitespace-nowrap"
+            className="font-mono font-medium whitespace-nowrap inline-flex items-baseline transition-colors"
             style={{
-              color: scrolled ? '#0a0a0a' : '#ffffff',
+              fontSize: 'clamp(0.8rem, 1.5vw, 0.95rem)',
+              letterSpacing: '-0.01em',
               textShadow: scrolled ? 'none' : '0 1px 14px rgba(0,0,0,0.45)',
             }}
           >
-            LUNSFORD
+            <span style={{ color: scrolled ? '#0a0a0a' : '#ffffff' }}>
+              lunsford
+            </span>
+            <span style={{ color: scrolled ? '#9ca3af' : 'rgba(255,255,255,0.48)' }}>
+              .dev
+            </span>
             <span
-              className="transition-colors"
-              style={{ color: scrolled ? '#9ca3af' : 'rgba(255,255,255,0.78)' }}
+              className="term-cursor ml-px"
+              aria-hidden="true"
+              style={{ color: scrolled ? '#0a0a0a' : '#ffffff' }}
             >
-              /SOFTWARE
+              █
             </span>
           </a>
 

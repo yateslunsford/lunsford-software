@@ -1,0 +1,86 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1600" fill="#0a0a0a"/>
+
+  <!-- ================================================================ -->
+  <!-- CONCEPT 1 — THE BRACKET MARK (primary icon)                       -->
+  <!-- A precise L built inside a code bracket. Obviously software.      -->
+  <!-- ================================================================ -->
+  <g transform="translate(490, 90)">
+    <!-- outer ring container -->
+    <rect x="0" y="0" width="220" height="220" rx="44" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.18"/>
+
+    <!-- left bracket -->
+    <path d="M 70 62 L 56 62 L 56 158 L 70 158" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="square"/>
+    <!-- right bracket -->
+    <path d="M 150 62 L 164 62 L 164 158 L 150 158" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="square"/>
+
+    <!-- the L, precise geometric, centered between brackets -->
+    <path d="M 95 76 L 95 144 L 132 144" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="square" stroke-linejoin="miter"/>
+  </g>
+
+  <text x="600" y="380" font-family="'SF Mono','Roboto Mono',monospace" font-size="15" fill="#ffffff" text-anchor="middle" letter-spacing="8" opacity="0.5">PRIMARY ICON</text>
+
+  <line x1="160" y1="440" x2="1040" y2="440" stroke="#ffffff" stroke-width="1" opacity="0.1"/>
+
+  <!-- ================================================================ -->
+  <!-- CONCEPT 2 — TERMINAL WORDMARK                                     -->
+  <!-- Lowercase monospace with a prompt + cursor. Dev-native feel.      -->
+  <!-- ================================================================ -->
+  <g transform="translate(600, 540)">
+    <text x="0" y="0" font-family="'SF Mono','Roboto Mono','Courier New',monospace" font-size="58" font-weight="500" fill="#ffffff" text-anchor="middle" letter-spacing="-1">lunsford<tspan fill="#666666">.dev</tspan></text>
+    <!-- cursor block -->
+    <rect x="232" y="-46" width="20" height="50" fill="#ffffff"/>
+  </g>
+
+  <text x="600" y="640" font-family="'SF Mono','Roboto Mono',monospace" font-size="15" fill="#ffffff" text-anchor="middle" letter-spacing="8" opacity="0.5">TERMINAL WORDMARK</text>
+
+  <line x1="160" y1="700" x2="1040" y2="700" stroke="#ffffff" stroke-width="1" opacity="0.1"/>
+
+  <!-- ================================================================ -->
+  <!-- CONCEPT 3 — EDITORIAL LOCKUP (refined, agency-grade)              -->
+  <!-- Clean tracked uppercase. The look his site already has.           -->
+  <!-- ================================================================ -->
+  <g transform="translate(600, 820)">
+    <text x="0" y="0" font-family="'Helvetica Neue',Arial,sans-serif" font-size="62" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="4">LUNSFORD</text>
+    <text x="0" y="48" font-family="'Helvetica Neue',Arial,sans-serif" font-size="20" font-weight="400" fill="#888888" text-anchor="middle" letter-spacing="20">SOFTWARE&#160;&#160;DEVELOPMENT</text>
+  </g>
+
+  <text x="600" y="980" font-family="'SF Mono','Roboto Mono',monospace" font-size="15" fill="#ffffff" text-anchor="middle" letter-spacing="8" opacity="0.5">EDITORIAL LOCKUP</text>
+
+  <line x1="160" y1="1040" x2="1040" y2="1040" stroke="#ffffff" stroke-width="1" opacity="0.1"/>
+
+  <!-- ================================================================ -->
+  <!-- CONCEPT 4 — HORIZONTAL (icon + wordmark for navbar)               -->
+  <!-- ================================================================ -->
+  <g transform="translate(330, 1130)">
+    <!-- mini bracket icon -->
+    <rect x="0" y="0" width="92" height="92" rx="20" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.18"/>
+    <path d="M 30 28 L 23 28 L 23 64 L 30 64" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="square"/>
+    <path d="M 62 28 L 69 28 L 69 64 L 62 64" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="square"/>
+    <path d="M 40 33 L 40 60 L 55 60" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="square"/>
+
+    <!-- wordmark -->
+    <text x="120" y="42" font-family="'Helvetica Neue',Arial,sans-serif" font-size="32" font-weight="700" fill="#ffffff" letter-spacing="2">LUNSFORD</text>
+    <text x="120" y="74" font-family="'SF Mono','Roboto Mono',monospace" font-size="15" font-weight="400" fill="#888888" letter-spacing="9">SOFTWARE DEV</text>
+  </g>
+
+  <text x="600" y="1300" font-family="'SF Mono','Roboto Mono',monospace" font-size="15" fill="#ffffff" text-anchor="middle" letter-spacing="8" opacity="0.5">HORIZONTAL — NAVBAR</text>
+
+  <line x1="160" y1="1360" x2="1040" y2="1360" stroke="#ffffff" stroke-width="1" opacity="0.1"/>
+
+  <!-- ================================================================ -->
+  <!-- ON WHITE — to prove it works inverted                             -->
+  <!-- ================================================================ -->
+  <g transform="translate(160, 1410)">
+    <rect x="0" y="0" width="880" height="130" rx="14" fill="#ffffff"/>
+    <!-- mini bracket icon dark -->
+    <g transform="translate(50, 30)">
+      <path d="M 18 8 L 11 8 L 11 60 L 18 60" fill="none" stroke="#0a0a0a" stroke-width="5" stroke-linecap="square"/>
+      <path d="M 52 8 L 59 8 L 59 60 L 52 60" fill="none" stroke="#0a0a0a" stroke-width="5" stroke-linecap="square"/>
+      <path d="M 28 15 L 28 52 L 45 52" fill="none" stroke="#0a0a0a" stroke-width="6" stroke-linecap="square"/>
+    </g>
+    <text x="150" y="62" font-family="'Helvetica Neue',Arial,sans-serif" font-size="34" font-weight="700" fill="#0a0a0a" letter-spacing="2">LUNSFORD</text>
+    <text x="150" y="94" font-family="'SF Mono','Roboto Mono',monospace" font-size="15" font-weight="400" fill="#888888" letter-spacing="9">SOFTWARE DEVELOPMENT</text>
+  </g>
+
+</svg>

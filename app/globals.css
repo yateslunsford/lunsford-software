@@ -60,6 +60,21 @@ html {
   to   { transform: translateX(100%); }
 }
 
+/* ─── Terminal cursor blink ─── */
+@keyframes termCursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.term-cursor {
+  animation: termCursor 1.1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-cursor {
+    animation: none;
+  }
+}
+
 /* ─── Hide scrollbar while preserving scroll + iOS touch ─── */
 .hide-scrollbar {
   scrollbar-width: none;

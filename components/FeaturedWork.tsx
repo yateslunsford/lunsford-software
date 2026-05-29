@@ -9,6 +9,7 @@ import { projects, type Project } from '@/lib/projects';
 import MagneticCTA from '@/components/MagneticCTA';
 import Button from '@/components/ui/Button';
 import Marquee from '@/components/Marquee';
+import CodeBackdrop from '@/components/CodeBackdrop';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -69,6 +70,9 @@ export default function FeaturedWork() {
       ref={sectionRef}
       className="relative bg-black overflow-hidden py-16 sm:py-20 md:py-24"
     >
+      {/* Code backdrop — deepest layer, white text at ~7% opacity */}
+      <CodeBackdrop />
+
       {/* Starfield — 30 % opacity, sits behind all content */}
       <div
         className="absolute inset-0 pointer-events-none"
