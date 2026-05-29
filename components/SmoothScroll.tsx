@@ -27,14 +27,12 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      prevent: (node: HTMLElement) => !!node.closest('[data-lenis-prevent]'),
     });
 
     // Keep ScrollTrigger in lock-step with Lenis' tick.
     const onScroll = () => ScrollTrigger.update();
     lenis.on('scroll', onScroll);
-
-    // Smooth out mobile touch scrolling — fixes jank on iOS/Android
-    ScrollTrigger.normalizeScroll(true);
 
     let rafId = 0;
     function raf(time: number) {
@@ -46,7 +44,6 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     return () => {
       cancelAnimationFrame(rafId);
       lenis.off('scroll', onScroll);
-      ScrollTrigger.normalizeScroll(false);
       lenis.destroy();
     };
   }, []);

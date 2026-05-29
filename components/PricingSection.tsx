@@ -371,7 +371,8 @@ export default function PricingSection({
       {/* Mobile: carousel */}
       <div
         ref={carouselRef}
-        className="md:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 hide-scrollbar"
+        data-lenis-prevent
+        className="md:hidden flex gap-4 overflow-x-scroll pb-4 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 hide-scrollbar touch-pan-x overscroll-x-contain"
       >
         {TIERS.map((tier) => (
           <MobileCard
